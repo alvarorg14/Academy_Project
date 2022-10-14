@@ -22,6 +22,8 @@ public class MoviesController {
 
     @GetMapping(value = "/findByTitle", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Movie> findByTitle(@RequestParam String title){
-        return moviesService.findByTitle(title);
+        List<Movie> movies = moviesService.findByTitle(title);
+        System.out.println(movies.get(0));
+        return movies;
     }
 }

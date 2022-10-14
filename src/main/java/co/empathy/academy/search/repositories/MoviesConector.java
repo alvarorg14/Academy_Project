@@ -35,7 +35,9 @@ public class MoviesConector {
             List<Hit<Movie>> hits = response.hits().hits();
             List<Movie> result = new ArrayList<>();
             for (Hit<Movie> hit: hits){
-                result.add(hit.source());
+                Movie movie = hit.source();
+                movie.setId(hit.id());
+                result.add(movie);
             }
             return result;
         } catch (IOException e) {
