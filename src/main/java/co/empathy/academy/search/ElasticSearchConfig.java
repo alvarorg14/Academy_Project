@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class ElasticSearchConfig  {
 
-    /*
+
     @Bean
     public ElasticsearchClient getElasticSearchClient(){
         RestClient restClient = RestClient.builder(new HttpHost("localhost", 9200)).build();
@@ -23,7 +23,7 @@ public class ElasticSearchConfig  {
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
 
         return new ElasticsearchClient(transport);
-    }*/
+    }
 
 
     @Bean
