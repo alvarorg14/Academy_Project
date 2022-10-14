@@ -1,4 +1,4 @@
-package co.empathy.academy.search.entieties;
+package co.empathy.academy.search.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;

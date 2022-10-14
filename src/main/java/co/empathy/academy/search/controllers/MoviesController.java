@@ -1,6 +1,6 @@
 package co.empathy.academy.search.controllers;
 
-import co.empathy.academy.search.entieties.Movie;
+import co.empathy.academy.search.entities.Movie;
 import co.empathy.academy.search.services.MoviesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;

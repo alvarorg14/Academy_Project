@@ -1,6 +1,6 @@
 package co.empathy.academy.search.controllers;
 
-import co.empathy.academy.search.entieties.QueryResponse;
+import co.empathy.academy.search.entities.QueryResponse;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;

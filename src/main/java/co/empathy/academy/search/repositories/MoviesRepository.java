@@ -1,6 +1,6 @@
 package co.empathy.academy.search.repositories;
 
-import co.empathy.academy.search.entieties.Movie;
+import co.empathy.academy.search.entities.Movie;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import java.util.List;
