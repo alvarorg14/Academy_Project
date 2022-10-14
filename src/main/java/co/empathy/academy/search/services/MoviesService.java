@@ -18,7 +18,7 @@ public class MoviesService{
     private MoviesConector moviesConector;
 
     public void createMovie(Movie movie){
-        moviesRepository.save(movie);
+        moviesConector.indexMovie(movie);
     }
 
     public void createMovieBulk(List<Movie> movies){

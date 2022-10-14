@@ -1,6 +1,8 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
+import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.search.entities.Movie;
@@ -40,5 +42,18 @@ public class MoviesConector {
             e.printStackTrace();
         }
         return new ArrayList<>();
+    }
+
+    public void indexMovie(Movie movie){
+        IndexRequest<Movie> request = IndexRequest.of(i -> i
+                .index(index)
+                .id(movie.getId())
+                .document(movie));
+
+        try {
+            IndexResponse response = client.index(request);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
