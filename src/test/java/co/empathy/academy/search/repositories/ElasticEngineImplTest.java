@@ -1,21 +1,17 @@
 package co.empathy.academy.search.repositories;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.entity.HttpEntityWrapper;
-import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
 
-import javax.websocket.RemoteEndpoint;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -39,7 +35,6 @@ class ElasticEngineImplTest {
         ElasticEngineImpl elasticEngine = new ElasticEngineImpl(client);
 
         String response = elasticEngine.getElasticInfo();
-
         assertEquals(expectedResponse, response);
     }
 
@@ -50,6 +45,6 @@ class ElasticEngineImplTest {
 
         ElasticEngine elasticEngine = new ElasticEngineImpl(client);
 
-        assertThrows(RuntimeException.class, () -> elasticEngine.getElasticInfo());
+        assertThrows(RuntimeException.class, elasticEngine::getElasticInfo);
     }
 }
