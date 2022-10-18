@@ -1,4 +1,4 @@
-package co.empathy.academy.search;
+package co.empathy.academy.search.configuration;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
@@ -19,15 +19,12 @@ public class ElasticSearchConfig  {
     @Bean
     public ElasticsearchClient getElasticSearchClient(){
         RestClient restClient = RestClient.builder(new HttpHost("localhost", 9200)).build();
-
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
-
         return new ElasticsearchClient(transport);
     }
 
-
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplateBuilder().build();
+    public RestClient getRestClient(){
+        return RestClient.builder(new HttpHost("localhost", 9200)).build();
     }
 }
