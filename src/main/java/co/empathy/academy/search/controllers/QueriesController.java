@@ -31,6 +31,13 @@ public class QueriesController {
         this.queriesService = queriesService;
     }
 
+    /**
+     * GET "/search" endpoint that returns the query and the cluster name
+     * @param query
+     * @return QueryResponse with the query and the cluster names
+     * @throws ParseException
+     * @throws IOException
+     */
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public QueryResponse search(@RequestParam("query") String query) throws ParseException, IOException {
         return queriesService.search(query);

@@ -23,4 +23,14 @@ class ElasticEngineImplTest {
 
         //TODO
     }
+
+    @Test
+    void givenElasticUp_whenGetElasticInfo_thenRuntimeExcpetion() throws IOException {
+        RestClient client = mock(RestClient.class);
+        given(client.performRequest(any())).willThrow(new IOException());
+
+        ElasticEngine elasticEngine = new ElasticEngineImpl(client);
+
+        assertThrows(RuntimeException.class, () -> elasticEngine.getElasticInfo());
+    }
 }

@@ -15,6 +15,10 @@ public class ElasticEngineImpl implements ElasticEngine {
         this.client = client;
     }
 
+    /**
+     * Makes a petition to elastic search, similar to making a request to http://localhost:9200
+     * @return elasticsearch information
+     */
     @Override
     public String getElasticInfo() {
         Request request = new Request("GET", "/");

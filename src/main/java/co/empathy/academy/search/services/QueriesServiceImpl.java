@@ -13,6 +13,11 @@ public class QueriesServiceImpl implements QueriesService {
         this.elasticEngine = elasticEngine;
     }
 
+    /**
+     * Makes a request to obtain the cluster name and returns it and the query performed.
+     * @param query
+     * @return QueryResponse
+     */
     @Override
     public QueryResponse search(String query) {
         String elasticInfo = elasticEngine.getElasticInfo();
