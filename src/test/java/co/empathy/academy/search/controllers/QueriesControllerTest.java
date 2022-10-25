@@ -1,6 +1,6 @@
 package co.empathy.academy.search.controllers;
 
-import co.empathy.academy.search.entities.QueryResponse;
+import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.services.QueriesService;
 import org.apache.tomcat.util.json.ParseException;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 

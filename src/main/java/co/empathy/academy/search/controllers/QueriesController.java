@@ -1,31 +1,22 @@
 package co.empathy.academy.search.controllers;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.empathy.academy.search.entities.QueryResponse;
+import co.empathy.academy.search.models.Movie;
+import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.services.QueriesService;
-import jakarta.json.JsonObject;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.http.util.EntityUtils;
-import org.apache.tomcat.util.json.JSONParser;
-import org.apache.tomcat.util.json.ParseException;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
 @RestController
-@Slf4j
+@RequestMapping("/search")
 public class QueriesController {
 
-    private QueriesService queriesService;
+    private final QueriesService queriesService;
 
     public QueriesController(QueriesService queriesService) {
         this.queriesService = queriesService;
@@ -33,13 +24,48 @@ public class QueriesController {
 
     /**
      * GET "/search" endpoint that returns the query and the cluster name
-     * @param query
+     *
+     * @param query - query to search
      * @return QueryResponse with the query and the cluster names
-     * @throws ParseException
-     * @throws IOException
      */
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public QueryResponse search(@RequestParam("query") String query) throws ParseException, IOException {
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public QueryResponse search(@RequestParam("query") String query) {
         return queriesService.search(query);
+    }
+
+    /**
+     * GET /search/multi - Performs a multi match query to the movies index
+     *
+     * @param query  Query to search
+     * @param fields Fields to search
+     * @return ResponseEntity with the list of movies
+     */
+    @GetMapping(value = "/multi", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Movie>> multiMatch(@RequestParam("query") String query, @RequestParam("fields") String fields) {
+        return ResponseEntity.ok().body(queriesService.multiMatch(query, fields));
+    }
+
+    /**
+     * GET /search/term - Performs a term query to the movies index
+     *
+     * @param value Value to search
+     * @param field Field to search
+     * @return ResponseEntity with the list of movies
+     */
+    @GetMapping(value = "/term", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Movie>> termQuery(@RequestParam("value") String value, @RequestParam("field") String field) {
+        return ResponseEntity.ok().body(queriesService.termQuery(value, field));
+    }
+
+    /**
+     * GET /search/terms - Performs a terms query to the movies index
+     *
+     * @param values Values to search
+     * @param field  Field to search
+     * @return ResponseEntity with the list of movies
+     */
+    @GetMapping(value = "/terms", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Movie>> termsQuery(@RequestParam("values") String values, @RequestParam("field") String field) {
+        return ResponseEntity.ok().body(queriesService.termsQuery(values, field));
     }
 }

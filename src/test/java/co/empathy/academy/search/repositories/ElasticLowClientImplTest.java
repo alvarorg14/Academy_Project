@@ -17,7 +17,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-class ElasticEngineImplTest {
+class ElasticLowClientImplTest {
 
     @Test
     void givenElasticUp_whenGetElasticInfo_thenElasticInfoReturned() throws IOException {
@@ -32,7 +32,7 @@ class ElasticEngineImplTest {
         RestClient client = mock(RestClient.class);
         given(client.performRequest(any())).willReturn(mockResponse);
 
-        ElasticEngineImpl elasticEngine = new ElasticEngineImpl(client);
+        ElasticLowClientImpl elasticEngine = new ElasticLowClientImpl(client);
 
         String response = elasticEngine.getElasticInfo();
         assertEquals(expectedResponse, response);
@@ -43,8 +43,8 @@ class ElasticEngineImplTest {
         RestClient client = mock(RestClient.class);
         given(client.performRequest(any())).willThrow(new IOException());
 
-        ElasticEngine elasticEngine = new ElasticEngineImpl(client);
+        ElasticLowClient elasticLowClient = new ElasticLowClientImpl(client);
 
-        assertThrows(RuntimeException.class, elasticEngine::getElasticInfo);
+        assertThrows(RuntimeException.class, elasticLowClient::getElasticInfo);
     }
 }

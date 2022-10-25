@@ -1,7 +1,8 @@
 package co.empathy.academy.search.services;
 
-import co.empathy.academy.search.entities.QueryResponse;
+import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.repositories.ElasticEngine;
+import co.empathy.academy.search.repositories.ElasticLowClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,10 +18,12 @@ class QueriesServiceImplTest {
     @Test
     void givenQuery_whenSearch_thenQueryResponse() {
         String query = "query";
-        ElasticEngine elasticEngine = mock(ElasticEngine.class);
-        given(elasticEngine.getElasticInfo()).willReturn("{\"cluster_name\":\"docker-cluster\"}");
+        ElasticLowClient elasticLowClient = mock(ElasticLowClient.class);
+        given(elasticLowClient.getElasticInfo()).willReturn("{\"cluster_name\":\"docker-cluster\"}");
 
-        QueriesService queriesService = new QueriesServiceImpl(elasticEngine);
+        ElasticEngine elasticEngine = mock(ElasticEngine.class);
+
+        QueriesService queriesService = new QueriesServiceImpl(elasticLowClient, elasticEngine);
 
         QueryResponse response = queriesService.search(query);
 
@@ -31,10 +34,11 @@ class QueriesServiceImplTest {
     void givenQueryAndElasticDown_whenSearch_thenRuntimeException() {
         String query = "query";
 
-        ElasticEngine elasticEngine = mock(ElasticEngine.class);
-        given(elasticEngine.getElasticInfo()).willThrow(new RuntimeException());
+        ElasticLowClient elasticLowClient = mock(ElasticLowClient.class);
+        given(elasticLowClient.getElasticInfo()).willThrow(new RuntimeException());
 
-        QueriesService queriesService = new QueriesServiceImpl(elasticEngine);
+        ElasticEngine elasticEngine = mock(ElasticEngine.class);
+        QueriesService queriesService = new QueriesServiceImpl(elasticLowClient, elasticEngine);
 
         assertThrows(RuntimeException.class, () -> queriesService.search(query));
     }
