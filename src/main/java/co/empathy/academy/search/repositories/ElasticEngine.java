@@ -10,10 +10,9 @@ public interface ElasticEngine {
     /**
      * Creates an index using the elastic client
      *
-     * @param name - name of the index
-     * @throws Exception - if the index cannot be created
+     * @throws IOException - if the index cannot be created
      */
-    void createIndex(String name) throws IOException;
+    void createIndex() throws IOException;
 
     /**
      * Puts the settings of the index
@@ -32,11 +31,10 @@ public interface ElasticEngine {
     /**
      * Indexes a movie document
      *
-     * @param indexName - name of the index where the document will be indexed
-     * @param movie     - movie to be indexed
+     * @param movie - movie to be indexed
      * @throws IOException - if the document cannot be indexed
      */
-    void indexDocument(String indexName, Movie movie) throws IOException;
+    void indexDocument(Movie movie) throws IOException;
 
     /**
      * Performs a multi match query

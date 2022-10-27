@@ -19,15 +19,14 @@ public class IndexController {
     }
 
     /**
-     * PUT /index/create/{name} - Creates a new index
+     * PUT /index/create - Creates a new index
      *
-     * @param name - name of the index
      * @return ResponseEntity - 200 if the index was created, 400 if the index already exists and 500 if there was an error
      */
-    @PutMapping("/create/{name}")
-    public ResponseEntity<String> createIndex(@PathVariable String name) {
+    @PutMapping("/create")
+    public ResponseEntity<String> createIndex() {
         try {
-            indexService.createIndex(name);
+            indexService.createIndex();
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body("Error creating index");
         }
@@ -38,18 +37,17 @@ public class IndexController {
     /**
      * POST /index - Indexes a new document
      *
-     * @param indexName - name of the index where the document will be indexed
-     * @param movie     - movie to be indexed
+     * @param movie - movie to be indexed
      * @return ResponseEntity - 200 if the document was indexed and 500 if there was an error
      */
     @PostMapping("/{indexName}")
-    public ResponseEntity<Movie> indexDocument(@PathVariable String indexName, @RequestBody Movie movie) {
+    public ResponseEntity<Movie> indexDocument(@RequestBody Movie movie) {
         try {
-            indexService.indexDocument(indexName, movie);
+            indexService.indexDocument(movie);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(movie, HttpStatus.OK);
+        return ResponseEntity.ok(movie);
     }
 
 }

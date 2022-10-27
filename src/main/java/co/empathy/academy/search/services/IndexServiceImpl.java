@@ -17,12 +17,11 @@ public class IndexServiceImpl implements IndexService {
     /**
      * Creates an index in elastic
      *
-     * @param name - name of the index
-     * @throws Exception - if the index cannot be created
+     * @throws IOException - if the index cannot be created
      */
     @Override
-    public void createIndex(String name) throws IOException {
-        elasticEngine.createIndex(name);
+    public void createIndex() throws IOException {
+        elasticEngine.createIndex();
         elasticEngine.putSettings();
         elasticEngine.putMapping();
     }
@@ -30,12 +29,11 @@ public class IndexServiceImpl implements IndexService {
     /**
      * Indexes a document
      *
-     * @param indexName - name of the index where the document will be indexed
-     * @param movie     - movie to be indexed
+     * @param movie - movie to be indexed
      * @throws IOException - if the document cannot be indexed
      */
     @Override
-    public void indexDocument(String indexName, Movie movie) throws IOException {
-        elasticEngine.indexDocument(indexName, movie);
+    public void indexDocument(Movie movie) throws IOException {
+        elasticEngine.indexDocument(movie);
     }
 }

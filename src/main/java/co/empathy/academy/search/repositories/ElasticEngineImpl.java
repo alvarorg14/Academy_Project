@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.search.models.Movie;
 
 import java.io.IOException;
@@ -24,18 +25,17 @@ public class ElasticEngineImpl implements ElasticEngine {
     /**
      * Creates an index in the cluster using the elastic client.
      *
-     * @param name - name of the index
-     * @throws Exception - if the index cannot be created
+     * @throws IOException - if the index cannot be created
      */
     @Override
-    public void createIndex(String name) throws IOException {
+    public void createIndex() throws IOException {
         try {
             client.indices().delete(d -> d.index(INDEX_NAME));
         } catch (Exception e) {
             // Ignore
         }
 
-        client.indices().create(c -> c.index(name));
+        client.indices().create(c -> c.index(INDEX_NAME));
     }
 
     /**
@@ -67,14 +67,13 @@ public class ElasticEngineImpl implements ElasticEngine {
     /**
      * Indexes a document
      *
-     * @param indexName - name of the index where the document will be indexed
-     * @param movie     - movie to be indexed
+     * @param movie - movie to be indexed
      * @throws IOException - if the document cannot be indexed
      */
     @Override
-    public void indexDocument(String indexName, Movie movie) throws IOException {
+    public void indexDocument(Movie movie) throws IOException {
         client.index(i -> i
-                .index(indexName)
+                .index(INDEX_NAME)
                 .id(movie.getTconst())
                 .document(movie));
     }
@@ -96,11 +95,9 @@ public class ElasticEngineImpl implements ElasticEngine {
                     .index(INDEX_NAME)
                     .query(multiMatchQuery), Movie.class);
 
-            List<Movie> movies = response.hits().hits().stream()
-                    .map(h -> h.source())
+            return response.hits().hits().stream()
+                    .map(Hit::source)
                     .toList();
-
-            return movies;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -124,11 +121,9 @@ public class ElasticEngineImpl implements ElasticEngine {
                     .index(INDEX_NAME)
                     .query(termQuery), Movie.class);
 
-            List<Movie> movies = response.hits().hits().stream()
-                    .map(h -> h.source())
+            return response.hits().hits().stream()
+                    .map(Hit::source)
                     .toList();
-
-            return movies;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -156,11 +151,9 @@ public class ElasticEngineImpl implements ElasticEngine {
                     .index(INDEX_NAME)
                     .query(termsQuery), Movie.class);
 
-            List<Movie> movies = response.hits().hits().stream()
-                    .map(h -> h.source())
+            return response.hits().hits().stream()
+                    .map(Hit::source)
                     .toList();
-
-            return movies;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
