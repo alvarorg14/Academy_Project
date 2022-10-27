@@ -1,17 +1,19 @@
 package co.empathy.academy.search.models;
 
-import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
+@Value
+@NoArgsConstructor(force = true)
 public class Movie {
 
-    private String tconst;
-    private String titleType;
-    private String primaryTitle;
-    private String originalTitle;
-    private boolean isAdult;
-    private String startYear;
-    private String endYear;
-    private int runtimeMinutes;
-    private String genres;
+    String tconst;
+    String titleType;
+    String primaryTitle;
+    String originalTitle;
+    boolean adult;
+    String startYear;
+    String endYear;
+    int runtimeMinutes;
+    String genres;
 }
