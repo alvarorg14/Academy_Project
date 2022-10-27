@@ -30,9 +30,8 @@ public class IndexController {
             indexService.createIndex(name);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body("Error creating index");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Index already exists");
         }
+
         return ResponseEntity.ok("Index created");
     }
 

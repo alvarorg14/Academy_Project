@@ -13,7 +13,21 @@ public interface ElasticEngine {
      * @param name - name of the index
      * @throws Exception - if the index cannot be created
      */
-    void createIndex(String name) throws Exception;
+    void createIndex(String name) throws IOException;
+
+    /**
+     * Puts the settings of the index
+     *
+     * @throws IOException - If the settings cannot be loaded
+     */
+    void putSettings() throws IOException;
+
+    /**
+     * Puts the mapping of the index
+     *
+     * @throws IOException If the mapping cannot be loaded
+     */
+    void putMapping() throws IOException;
 
     /**
      * Indexes a movie document

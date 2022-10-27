@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_standard": {
+          "type": "standard",
+          "max_token_length": 10,
+          "stopwords": "_english_"
+        }
+      }
+    }
+  }
+}

@@ -21,8 +21,10 @@ public class IndexServiceImpl implements IndexService {
      * @throws Exception - if the index cannot be created
      */
     @Override
-    public void createIndex(String name) throws Exception {
+    public void createIndex(String name) throws IOException {
         elasticEngine.createIndex(name);
+        elasticEngine.putSettings();
+        elasticEngine.putMapping();
     }
 
     /**

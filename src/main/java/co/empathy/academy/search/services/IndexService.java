@@ -12,7 +12,7 @@ public interface IndexService {
      * @param name - name of the index
      * @throws Exception - if the index cannot be created
      */
-    void createIndex(String name) throws Exception;
+    void createIndex(String name) throws IOException;
 
     /**
      * Indexes a document

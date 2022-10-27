@@ -1,0 +1,33 @@
+{
+  "properties": {
+    "tconst": {
+      "type": "keyword"
+    },
+    "titleType": {
+      "type": "keyword"
+    },
+    "primaryTitle": {
+      "type": "text",
+      "analyzer": "my_standard"
+    },
+    "originalTitle": {
+      "type": "text",
+      "analyzer": "my_standard"
+    },
+    "isAdult": {
+      "type": "boolean"
+    },
+    "startYear": {
+      "type": "integer"
+    },
+    "endYear": {
+      "type": "integer"
+    },
+    "runtimeMinutes": {
+      "type": "integer"
+    },
+    "genres": {
+      "type": "keyword"
+    }
+  }
+}

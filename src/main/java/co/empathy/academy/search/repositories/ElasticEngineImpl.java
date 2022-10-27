@@ -1,19 +1,20 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.empathy.academy.search.models.Movie;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ElasticEngineImpl implements ElasticEngine {
 
+    private static final String INDEX_NAME = "movies";
     private final ElasticsearchClient client;
 
     public ElasticEngineImpl(ElasticsearchClient client) {
@@ -27,12 +28,40 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @throws Exception - if the index cannot be created
      */
     @Override
-    public void createIndex(String name) throws Exception {
+    public void createIndex(String name) throws IOException {
         try {
-            client.indices().create(c -> c.index(name));
-        } catch (ElasticsearchException e) {
-            throw new Exception(e);
+            client.indices().delete(d -> d.index(INDEX_NAME));
+        } catch (Exception e) {
+            // Ignore
         }
+
+        client.indices().create(c -> c.index(name));
+    }
+
+    /**
+     * Puts the settings of the index
+     *
+     * @throws IOException - If the settings cannot be loaded
+     */
+    @Override
+    public void putSettings() throws IOException {
+        client.indices().close(c -> c.index(INDEX_NAME));
+
+        InputStream analyzer = getClass().getClassLoader().getResourceAsStream("my_standard_analyzer.json");
+        client.indices().putSettings(p -> p.index(INDEX_NAME).withJson(analyzer));
+
+        client.indices().open(o -> o.index(INDEX_NAME));
+    }
+
+    /**
+     * Puts the mapping of the index
+     *
+     * @throws IOException If the mapping cannot be loaded
+     */
+    @Override
+    public void putMapping() throws IOException {
+        InputStream mapping = getClass().getClassLoader().getResourceAsStream("mapping.json");
+        client.indices().putMapping(p -> p.index(INDEX_NAME).withJson(mapping));
     }
 
     /**
@@ -64,7 +93,7 @@ public class ElasticEngineImpl implements ElasticEngine {
                 .fields(Arrays.stream(fields).toList()))._toQuery();
         try {
             SearchResponse<Movie> response = client.search(s -> s
-                    .index("movies")
+                    .index(INDEX_NAME)
                     .query(multiMatchQuery), Movie.class);
 
             List<Movie> movies = response.hits().hits().stream()
@@ -92,7 +121,7 @@ public class ElasticEngineImpl implements ElasticEngine {
                 .field(field))._toQuery();
         try {
             SearchResponse<Movie> response = client.search(s -> s
-                    .index("movies")
+                    .index(INDEX_NAME)
                     .query(termQuery), Movie.class);
 
             List<Movie> movies = response.hits().hits().stream()
@@ -124,7 +153,7 @@ public class ElasticEngineImpl implements ElasticEngine {
 
         try {
             SearchResponse<Movie> response = client.search(s -> s
-                    .index("movies")
+                    .index(INDEX_NAME)
                     .query(termsQuery), Movie.class);
 
             List<Movie> movies = response.hits().hits().stream()
