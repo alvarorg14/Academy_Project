@@ -49,7 +49,7 @@ public class QueriesServiceImpl implements QueriesService {
     @Override
     public List<Movie> multiMatch(String query, String fields) {
         String[] fieldsArray = fields.split(",");
-        return elasticEngine.multiMatch(query, fieldsArray);
+        return elasticEngine.performQuery(elasticEngine.multiMatch(query, fieldsArray));
     }
 
     /**
@@ -61,7 +61,7 @@ public class QueriesServiceImpl implements QueriesService {
      */
     @Override
     public List<Movie> termQuery(String value, String field) {
-        return elasticEngine.termQuery(value, field);
+        return elasticEngine.performQuery(elasticEngine.termQuery(value, field));
     }
 
     /**
@@ -74,6 +74,6 @@ public class QueriesServiceImpl implements QueriesService {
     @Override
     public List<Movie> termsQuery(String values, String field) {
         String[] valuesArray = values.split(",");
-        return elasticEngine.termsQuery(valuesArray, field);
+        return elasticEngine.performQuery(elasticEngine.termsQuery(valuesArray, field));
     }
 }

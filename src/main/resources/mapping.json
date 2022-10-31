@@ -14,7 +14,7 @@
       "type": "text",
       "analyzer": "my_standard"
     },
-    "adult": {
+    "isAdult": {
       "type": "boolean"
     },
     "startYear": {

@@ -79,66 +79,46 @@ public class ElasticEngineImpl implements ElasticEngine {
     }
 
     /**
-     * Performs a multi match query
+     * Creates a multimatch query
      *
      * @param query  - query to search
      * @param fields - fields to search
-     * @return - list of movies that match the query
+     * @return Query
      */
     @Override
-    public List<Movie> multiMatch(String query, String[] fields) {
+    public Query multiMatch(String query, String[] fields) {
         Query multiMatchQuery = MultiMatchQuery.of(m -> m
                 .query(query)
                 .fields(Arrays.stream(fields).toList()))._toQuery();
-        try {
-            SearchResponse<Movie> response = client.search(s -> s
-                    .index(INDEX_NAME)
-                    .query(multiMatchQuery), Movie.class);
 
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return multiMatchQuery;
     }
 
     /**
-     * Performs a term query
+     * Creates a term query
      *
      * @param field Field to search
      * @param value Value to search
-     * @return List of movies that match the query
+     * @return Query
      */
     @Override
-    public List<Movie> termQuery(String value, String field) {
+    public Query termQuery(String value, String field) {
         Query termQuery = TermQuery.of(t -> t
                 .value(value)
                 .field(field))._toQuery();
-        try {
-            SearchResponse<Movie> response = client.search(s -> s
-                    .index(INDEX_NAME)
-                    .query(termQuery), Movie.class);
 
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return termQuery;
     }
 
     /**
-     * Performs a terms query
+     * Creates a terms query
      *
      * @param values Values to search
      * @param field  Field to search
-     * @return List of movies that match the query
+     * @return Query
      */
     @Override
-    public List<Movie> termsQuery(String[] values, String field) {
+    public Query termsQuery(String[] values, String field) {
         TermsQueryField termsQueryField = TermsQueryField.of(t -> t
                 .value(Arrays.stream(values).toList().stream().map(FieldValue::of).collect(Collectors.toList())));
 
@@ -146,10 +126,21 @@ public class ElasticEngineImpl implements ElasticEngine {
                 .field(field)
                 .terms(termsQueryField))._toQuery();
 
+        return termsQuery;
+    }
+
+    /**
+     * Performs a query to elasticsearch
+     *
+     * @param query Query to make
+     * @return List of movies that match the query
+     */
+    @Override
+    public List<Movie> performQuery(Query query) {
         try {
             SearchResponse<Movie> response = client.search(s -> s
                     .index(INDEX_NAME)
-                    .query(termsQuery), Movie.class);
+                    .query(query), Movie.class);
 
             return response.hits().hits().stream()
                     .map(Hit::source)

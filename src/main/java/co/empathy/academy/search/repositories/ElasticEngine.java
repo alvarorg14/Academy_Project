@@ -1,5 +1,6 @@
 package co.empathy.academy.search.repositories;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.empathy.academy.search.models.Movie;
 
 import java.io.IOException;
@@ -37,29 +38,37 @@ public interface ElasticEngine {
     void indexDocument(Movie movie) throws IOException;
 
     /**
-     * Performs a multi match query
+     * Creates a multi match query
      *
      * @param query  - query to search
      * @param fields - fields to search
-     * @return - list of movies that match the query
+     * @return Query to be executed
      */
-    List<Movie> multiMatch(String query, String[] fields);
+    Query multiMatch(String query, String[] fields);
 
     /**
      * Performs a term query
      *
      * @param field - field to search
      * @param value - value to search
-     * @return - list of movies that match the query
+     * @return Query to be executed
      */
-    List<Movie> termQuery(String value, String field);
+    Query termQuery(String value, String field);
 
     /**
      * Performs a terms query
      *
      * @param values Values to search
      * @param field  Field to search
+     * @return Query to be executed
+     */
+    Query termsQuery(String[] values, String field);
+
+    /**
+     * Makes a query to elasticsearch
+     *
+     * @param query Query to make
      * @return List of movies that match the query
      */
-    List<Movie> termsQuery(String[] values, String field);
+    List<Movie> performQuery(Query query);
 }
