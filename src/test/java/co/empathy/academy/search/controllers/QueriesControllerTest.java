@@ -6,6 +6,7 @@ import org.apache.tomcat.util.json.ParseException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 
@@ -26,8 +27,8 @@ class QueriesControllerTest {
 
         QueriesController queriesController = new QueriesController(queriesService);
 
-        QueryResponse result = queriesController.search(query);
+        ResponseEntity<QueryResponse> result = queriesController.search(query);
 
-        assertEquals(response, result);
+        assertEquals(response, result.getBody());
     }
 }
