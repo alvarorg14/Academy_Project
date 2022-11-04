@@ -1,5 +1,6 @@
 package co.empathy.academy.search.services;
 
+import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.repositories.ElasticEngine;
 import co.empathy.academy.search.util.IMDbReader;
@@ -47,16 +48,12 @@ public class IndexServiceImpl implements IndexService {
      * @return True if the data was indexed correctly, false otherwise
      */
     @Override
-    public boolean indexImdbData(MultipartFile file) {
+    public void indexImdbData(MultipartFile file) throws IOException, BulkIndexException {
         IMDbReader reader = new IMDbReader(file);
 
         while (reader.hasDocuments()) {
             List<Movie> movies = reader.readDocuments();
-            boolean result = elasticEngine.indexBulk(movies);
-            if (!result) {
-                return false;
-            }
+            elasticEngine.indexBulk(movies);
         }
-        return true;
     }
 }

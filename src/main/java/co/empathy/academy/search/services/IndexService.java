@@ -1,5 +1,6 @@
 package co.empathy.academy.search.services;
 
+import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,5 +28,5 @@ public interface IndexService {
      *
      * @param file
      */
-    boolean indexImdbData(MultipartFile file);
+    void indexImdbData(MultipartFile file) throws IOException, BulkIndexException;
 }

@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 
 import java.io.IOException;
@@ -138,19 +139,16 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @return List of movies that match the query
      */
     @Override
-    public List<Movie> performQuery(Query query) {
-        try {
-            SearchResponse<Movie> response = client.search(s -> s
-                    .index(INDEX_NAME)
-                    .query(query), Movie.class);
+    public List<Movie> performQuery(Query query) throws IOException {
+        SearchResponse<Movie> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .query(query)
+                .size(100), Movie.class);
 
-            return response.hits().hits().stream()
-                    .map(Hit::source)
-                    .toList();
+        return response.hits().hits().stream()
+                .map(Hit::source)
+                .toList();
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -160,7 +158,7 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @return True if the movies were indexed, false otherwise
      */
     @Override
-    public boolean indexBulk(List<Movie> movies) {
+    public void indexBulk(List<Movie> movies) throws IOException, BulkIndexException {
         BulkRequest.Builder request = new BulkRequest.Builder();
 
         movies.forEach(movie -> request.operations(op -> op
@@ -169,11 +167,9 @@ public class ElasticEngineImpl implements ElasticEngine {
                         .id(movie.getTconst())
                         .document(movie))));
 
-        try {
-            BulkResponse bulkResponse = client.bulk(request.build());
-            return !bulkResponse.errors();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        BulkResponse bulkResponse = client.bulk(request.build());
+        if (bulkResponse.errors()) {
+            throw new BulkIndexException("Error indexing bulk");
         }
     }
 

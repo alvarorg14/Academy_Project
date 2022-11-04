@@ -7,6 +7,7 @@ import co.empathy.academy.search.repositories.ElasticLowClient;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 
+import java.io.IOException;
 import java.util.List;
 
 public class QueriesServiceImpl implements QueriesService {
@@ -47,7 +48,7 @@ public class QueriesServiceImpl implements QueriesService {
      * @return List of movies
      */
     @Override
-    public List<Movie> multiMatch(String query, String fields) {
+    public List<Movie> multiMatch(String query, String fields) throws IOException {
         String[] fieldsArray = fields.split(",");
         return elasticEngine.performQuery(elasticEngine.multiMatch(query, fieldsArray));
     }
@@ -60,7 +61,7 @@ public class QueriesServiceImpl implements QueriesService {
      * @return List of movies
      */
     @Override
-    public List<Movie> termQuery(String value, String field) {
+    public List<Movie> termQuery(String value, String field) throws IOException {
         return elasticEngine.performQuery(elasticEngine.termQuery(value, field));
     }
 
@@ -72,7 +73,7 @@ public class QueriesServiceImpl implements QueriesService {
      * @return List of movies
      */
     @Override
-    public List<Movie> termsQuery(String values, String field) {
+    public List<Movie> termsQuery(String values, String field) throws IOException {
         String[] valuesArray = values.split(",");
         return elasticEngine.performQuery(elasticEngine.termsQuery(valuesArray, field));
     }

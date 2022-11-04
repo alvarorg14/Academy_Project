@@ -1,11 +1,11 @@
 package co.empathy.academy.search.controllers;
 
+import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.services.IndexService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,7 +59,7 @@ public class IndexController {
         try {
             indexService.indexDocument(movie);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().build();
         }
         return ResponseEntity.created(null).body(movie);
     }
@@ -70,8 +70,20 @@ public class IndexController {
      * @param file - Title basics file containing the data to be indexed
      */
     @PostMapping("/imdb")
+    @Operation(summary = "Indexes imdb data in the index")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Data accepted for indexing"),
+            @ApiResponse(responseCode = "400", description = "Error indexing the data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error"),
+    })
     public ResponseEntity indexImdbData(@RequestParam("file") MultipartFile file) {
-        indexService.indexImdbData(file);
+        try {
+            indexService.indexImdbData(file);
+        } catch (BulkIndexException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
         return ResponseEntity.accepted().build();
     }
 

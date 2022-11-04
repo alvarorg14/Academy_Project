@@ -3,6 +3,7 @@ package co.empathy.academy.search.services;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface QueriesService {
@@ -16,7 +17,7 @@ public interface QueriesService {
      * @param fields - fields to search
      * @return List of movies
      */
-    List<Movie> multiMatch(String query, String fields);
+    List<Movie> multiMatch(String query, String fields) throws IOException;
 
     /**
      * Performs a term query to the movies index
@@ -25,7 +26,7 @@ public interface QueriesService {
      * @param field - field to search
      * @return List of movies
      */
-    List<Movie> termQuery(String value, String field);
+    List<Movie> termQuery(String value, String field) throws IOException;
 
     /**
      * Performs a terms query to the movies index
@@ -34,5 +35,5 @@ public interface QueriesService {
      * @param field  - field to search
      * @return List of movies
      */
-    List<Movie> termsQuery(String values, String field);
+    List<Movie> termsQuery(String values, String field) throws IOException;
 }

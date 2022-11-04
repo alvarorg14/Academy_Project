@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +59,7 @@ class QueriesServiceImplTest {
     }
 
     @Test
-    void givenQueryAndFields_whenMultiMatchQuery_thenMoviesReturned() {
+    void givenQueryAndFields_whenMultiMatchQuery_thenMoviesReturned() throws IOException {
         String query = "query";
         String fields = "field1,field2";
 
@@ -76,7 +77,7 @@ class QueriesServiceImplTest {
     }
 
     @Test
-    void givenQueryAndField_whenTermQuery_thenMoviesReturned() {
+    void givenQueryAndField_whenTermQuery_thenMoviesReturned() throws IOException {
         String query = "query";
         String field = "field1";
         given(elasticEngine.performQuery(any())).willReturn(new ArrayList<Movie>() {{
@@ -93,7 +94,7 @@ class QueriesServiceImplTest {
     }
 
     @Test
-    void givenQueriesAndFields_whenTermsQuery_thenMoviesReturned() {
+    void givenQueriesAndFields_whenTermsQuery_thenMoviesReturned() throws IOException {
         String queries = "query1,query2";
         String field = "field1";
         given(elasticEngine.performQuery(any())).willReturn(new ArrayList<Movie>() {{

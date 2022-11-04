@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -69,6 +69,7 @@ class ElasticEngineImplTest {
         assertTrue(termsQuery.isTerms());
     }
 
+
     @Test
     void givenMovies_whenBulkIndex_thenMoviesIndexed() throws IOException {
         BulkResponse mock = mock(BulkResponse.class);
@@ -76,18 +77,27 @@ class ElasticEngineImplTest {
         given(client.bulk((any(BulkRequest.class)))).willReturn(mock);
 
 
-        boolean result = new ElasticEngineImpl(client).indexBulk(movies);
-        assertTrue(result);
+        assertDoesNotThrow(() -> new ElasticEngineImpl(client).indexBulk(movies));
     }
 
     @Test
-    void givenMovies_whenBulkIndex_thenErrorIndexing() throws IOException {
+    void givenMovies_whenBulkIndex_thenBulkIndexException() throws IOException {
         BulkResponse mock = mock(BulkResponse.class);
         given(mock.errors()).willReturn(true);
         given(client.bulk((any(BulkRequest.class)))).willReturn(mock);
 
 
-        boolean result = new ElasticEngineImpl(client).indexBulk(movies);
-        assertFalse(result);
+        Exception exception = assertThrows(BulkIndexException.class, () -> new ElasticEngineImpl(client).indexBulk(movies));
+
+        String expectedMessage = "Error indexing bulk";
+        assertEquals(expectedMessage, exception.getMessage());
     }
+
+    @Test
+    void givenMovies_whenBulkIndex_thenIOException() throws IOException {
+        given(client.bulk((any(BulkRequest.class)))).willThrow(IOException.class);
+        assertThrows(IOException.class, () -> new ElasticEngineImpl(client).indexBulk(movies));
+    }
+
+
 }
