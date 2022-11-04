@@ -1,6 +1,7 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 
 import java.io.IOException;
@@ -70,7 +71,7 @@ public interface ElasticEngine {
      * @param query Query to make
      * @return List of movies that match the query
      */
-    List<Movie> performQuery(Query query);
+    List<Movie> performQuery(Query query) throws IOException;
 
     /**
      * Indexes a list of movies
@@ -78,5 +79,5 @@ public interface ElasticEngine {
      * @param movies Movies to index
      * @return True if the movies were indexed, false otherwise
      */
-    boolean indexBulk(List<Movie> movies);
+    void indexBulk(List<Movie> movies) throws IOException, BulkIndexException;
 }

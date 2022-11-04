@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -50,10 +51,15 @@ public class QueriesController {
     @Operation(summary = "Get movies by a multi match query")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of movies found, it can be empty"),
+            @ApiResponse(responseCode = "500", description = "Error searching the movies")
     })
     @GetMapping(value = "/multi", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Movie>> multiMatch(@RequestParam("query") String query, @RequestParam("fields") String fields) {
-        return ResponseEntity.ok().body(queriesService.multiMatch(query, fields));
+        try {
+            return ResponseEntity.ok(queriesService.multiMatch(query, fields));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**
@@ -66,10 +72,15 @@ public class QueriesController {
     @Operation(summary = "Get movies by a term query")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of movies found, it can be empty"),
+            @ApiResponse(responseCode = "500", description = "Error searching the movies")
     })
     @GetMapping(value = "/term", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Movie>> termQuery(@RequestParam("value") String value, @RequestParam("field") String field) {
-        return ResponseEntity.ok().body(queriesService.termQuery(value, field));
+        try {
+            return ResponseEntity.ok().body(queriesService.termQuery(value, field));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**
@@ -82,9 +93,14 @@ public class QueriesController {
     @Operation(summary = "Get movies by a terms query")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of movies found, it can be empty"),
+            @ApiResponse(responseCode = "500", description = "Error searching the movies")
     })
     @GetMapping(value = "/terms", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Movie>> termsQuery(@RequestParam("values") String values, @RequestParam("field") String field) {
-        return ResponseEntity.ok().body(queriesService.termsQuery(values, field));
+        try {
+            return ResponseEntity.ok().body(queriesService.termsQuery(values, field));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
