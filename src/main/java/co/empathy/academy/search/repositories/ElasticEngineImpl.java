@@ -3,6 +3,8 @@ package co.empathy.academy.search.repositories;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.search.models.Movie;
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class ElasticEngineImpl implements ElasticEngine {
 
-    private static final String INDEX_NAME = "movies";
+    private static final String INDEX_NAME = "imdb";
     private final ElasticsearchClient client;
 
     public ElasticEngineImpl(ElasticsearchClient client) {
@@ -47,7 +49,7 @@ public class ElasticEngineImpl implements ElasticEngine {
     public void putSettings() throws IOException {
         client.indices().close(c -> c.index(INDEX_NAME));
 
-        InputStream analyzer = getClass().getClassLoader().getResourceAsStream("my_standard_analyzer.json");
+        InputStream analyzer = getClass().getClassLoader().getResourceAsStream("custom_analyzer.json");
         client.indices().putSettings(p -> p.index(INDEX_NAME).withJson(analyzer));
 
         client.indices().open(o -> o.index(INDEX_NAME));
@@ -146,6 +148,30 @@ public class ElasticEngineImpl implements ElasticEngine {
                     .map(Hit::source)
                     .toList();
 
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Indexes a list of movies
+     *
+     * @param movies Movies to index
+     * @return True if the movies were indexed, false otherwise
+     */
+    @Override
+    public boolean indexBulk(List<Movie> movies) {
+        BulkRequest.Builder request = new BulkRequest.Builder();
+
+        movies.forEach(movie -> request.operations(op -> op
+                .index(i -> i
+                        .index(INDEX_NAME)
+                        .id(movie.getTconst())
+                        .document(movie))));
+
+        try {
+            BulkResponse bulkResponse = client.bulk(request.build());
+            return !bulkResponse.errors();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

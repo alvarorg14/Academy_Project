@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -61,6 +62,17 @@ public class IndexController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return ResponseEntity.created(null).body(movie);
+    }
+
+    /**
+     * POST /index/imdb - Indexes imdb data in the index
+     *
+     * @param file - Title basics file containing the data to be indexed
+     */
+    @PostMapping("/imdb")
+    public ResponseEntity indexImdbData(@RequestParam("file") MultipartFile file) {
+        indexService.indexImdbData(file);
+        return ResponseEntity.accepted().build();
     }
 
 }

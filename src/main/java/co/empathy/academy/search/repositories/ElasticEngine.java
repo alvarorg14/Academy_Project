@@ -71,4 +71,12 @@ public interface ElasticEngine {
      * @return List of movies that match the query
      */
     List<Movie> performQuery(Query query);
+
+    /**
+     * Indexes a list of movies
+     *
+     * @param movies Movies to index
+     * @return True if the movies were indexed, false otherwise
+     */
+    boolean indexBulk(List<Movie> movies);
 }
