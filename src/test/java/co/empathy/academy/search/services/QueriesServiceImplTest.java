@@ -26,8 +26,8 @@ class QueriesServiceImplTest {
     private final QueriesService queriesService = new QueriesServiceImpl(elasticLowClient, elasticEngine);
 
     private final Movie movie = new Movie("tTest", "testType", "testTitle",
-            "testOriginalTitle", false, "testStartYear",
-            "testEndYear", 100, "testGenres");
+            "testOriginalTitle", false, 0,
+            0, 100, "testGenres");
 
     @Test
     void givenQuery_whenSearch_thenQueryResponse() {

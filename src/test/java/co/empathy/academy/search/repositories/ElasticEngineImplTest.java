@@ -2,18 +2,36 @@ package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.empathy.academy.search.models.Movie;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class ElasticEngineImplTest {
 
     ElasticsearchClient client = mock(ElasticsearchClient.class);
+
+    Movie movie1 = new Movie("tconst1", "titleType1", "primaryTitle1",
+            "originalTitle1", false, 0, 0, 0, "genres1");
+    Movie movie2 = new Movie("tconst2", "titleType2", "primaryTitle2",
+            "originalTitle2", false, 0, 0, 0, "genres2");
+    List<Movie> movies = new ArrayList<>() {{
+        add(movie1);
+        add(movie2);
+    }};
 
     @Test
     void givenQueryAndFields_whenMultiMatchQuery_thenQueryFormed() {
@@ -25,7 +43,6 @@ class ElasticEngineImplTest {
         Query multiMatch = new ElasticEngineImpl(client).multiMatch(query, fields);
 
         assertTrue(multiMatch.isMultiMatch());
-        assertEquals(expectedQuery, multiMatch.toString());
     }
 
     @Test
@@ -38,7 +55,6 @@ class ElasticEngineImplTest {
         Query termQuery = new ElasticEngineImpl(client).termQuery(query, field);
 
         assertTrue(termQuery.isTerm());
-        assertEquals(expectedQuery, termQuery.toString());
     }
 
     @Test
@@ -51,42 +67,27 @@ class ElasticEngineImplTest {
         Query termsQuery = new ElasticEngineImpl(client).termsQuery(queries, field);
 
         assertTrue(termsQuery.isTerms());
-        assertEquals(expectedQuery, termsQuery.toString());
     }
 
-    /*
     @Test
-    void givenQuery_whenPerformQuery_thenMoviesReturned() throws IOException {
-        ElasticEngine elasticEngine = new ElasticEngineImpl(client);
-
-        Movie movie = new Movie("tTest", "testType", "testTitle",
-                "testOriginalTitle", false, "testStartYear",
-                "testEndYear", 100, "testGenres");
-
-        Query multiMatch = elasticEngine.multiMatch("test", new String[]{"primaryTitle", "originalTitle"});
-
-        Hit<Movie> hit = Hit.of(movieBuilder -> movieBuilder
-                .source(movie)
-                .index("testIndex")
-                .id(movie.getTconst()));
-
-        List<Hit<Movie>> hits = new ArrayList<>();
-        hits.add(hit);
-
-        HitsMetadata<Movie> hitsMetadata = HitsMetadata.of(b -> b.hits(hits));
-
-        SearchResponse<Movie> response = mock(SearchResponse.class);
-        given(response.hits().hits().stream()).willReturn(hitsMetadata.hits().stream());
+    void givenMovies_whenBulkIndex_thenMoviesIndexed() throws IOException {
+        BulkResponse mock = mock(BulkResponse.class);
+        given(mock.errors()).willReturn(false);
+        given(client.bulk((any(BulkRequest.class)))).willReturn(mock);
 
 
-        ElasticsearchClient client = mock(ElasticsearchClient.class);
-        given(client.search(c -> c.index("TestIndex").query(multiMatch), Movie.class)).willReturn(response);
+        boolean result = new ElasticEngineImpl(client).indexBulk(movies);
+        assertTrue(result);
+    }
 
-        List<Movie> movies = elasticEngine.performQuery(multiMatch);
+    @Test
+    void givenMovies_whenBulkIndex_thenErrorIndexing() throws IOException {
+        BulkResponse mock = mock(BulkResponse.class);
+        given(mock.errors()).willReturn(true);
+        given(client.bulk((any(BulkRequest.class)))).willReturn(mock);
 
-        assertEquals(1, movies.size());
-        assertEquals(movie, movies.get(0));
 
-        verify(client, times(1)).search(c -> c.index("TestIndex").query(multiMatch), Movie.class);
-    }*/
+        boolean result = new ElasticEngineImpl(client).indexBulk(movies);
+        assertFalse(result);
+    }
 }

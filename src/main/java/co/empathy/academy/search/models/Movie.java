@@ -13,9 +13,9 @@ public class Movie {
     String titleType;
     String primaryTitle;
     String originalTitle;
-    boolean adult;
-    String startYear;
-    String endYear;
+    Boolean isAdult;
+    int startYear;
+    int endYear;
     int runtimeMinutes;
     String genres;
 }

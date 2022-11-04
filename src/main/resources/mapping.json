@@ -8,11 +8,13 @@
     },
     "primaryTitle": {
       "type": "text",
-      "analyzer": "my_standard"
+      "analyzer": "custom_analyzer",
+      "search_analyzer": "custom_analyzer"
     },
     "originalTitle": {
       "type": "text",
-      "analyzer": "my_standard"
+      "analyzer": "custom_analyzer",
+      "search_analyzer": "custom_analyzer"
     },
     "isAdult": {
       "type": "boolean"
