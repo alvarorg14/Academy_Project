@@ -1,10 +1,10 @@
 package co.empathy.academy.search.services;
 
-import co.empathy.academy.search.models.Aka;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.repositories.ElasticEngine;
 import co.empathy.academy.search.repositories.ElasticLowClient;
+import co.empathy.academy.search.util.ResourcesUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,12 +27,7 @@ class QueriesServiceImplTest {
 
     private final QueriesService queriesService = new QueriesServiceImpl(elasticLowClient, elasticEngine);
 
-    private final List<Aka> akas = new ArrayList<>() {{
-        add(new Aka("title", "region", "language", true));
-    }};
-    private final Movie movie = new Movie("tTest", "testType", "testTitle",
-            "testOriginalTitle", false, 0,
-            0, 100, new String[]{"testGenre"}, 5.0, 10, akas);
+    private final Movie movie = ResourcesUtil.getMovie("");
 
     @Test
     void givenQuery_whenSearch_thenQueryResponse() {

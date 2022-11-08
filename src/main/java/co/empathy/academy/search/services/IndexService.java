@@ -29,6 +29,8 @@ public interface IndexService {
      * @param basicsFile  File with the imdb basics data
      * @param ratingsFile File with the imdb ratings data
      * @param akasFile    File with the imdb akas data
+     * @param crewFile    File with the imdb crew data
      */
-    void indexImdbData(MultipartFile basicsFile, MultipartFile ratingsFile, MultipartFile akasFile) throws IOException, BulkIndexException;
+    void indexImdbData(MultipartFile basicsFile, MultipartFile ratingsFile,
+                       MultipartFile akasFile, MultipartFile crewFile) throws IOException, BulkIndexException;
 }
