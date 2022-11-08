@@ -67,7 +67,8 @@ public class IndexController {
     /**
      * POST /index/imdb - Indexes imdb data in the index
      *
-     * @param file - Title basics file containing the data to be indexed
+     * @param basicsFile  - Title basics file containing the data to be indexed
+     * @param ratingsFile - Title ratings file containing the data to be indexed
      */
     @PostMapping("/imdb")
     @Operation(summary = "Indexes imdb data in the index")
@@ -76,9 +77,11 @@ public class IndexController {
             @ApiResponse(responseCode = "400", description = "Error indexing the data"),
             @ApiResponse(responseCode = "500", description = "Internal server error"),
     })
-    public ResponseEntity indexImdbData(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity indexImdbData(@RequestParam("basicsFile") MultipartFile basicsFile,
+                                        @RequestParam("ratingsFile") MultipartFile ratingsFile,
+                                        @RequestParam("akasFile") MultipartFile akasFile) {
         try {
-            indexService.indexImdbData(file);
+            indexService.indexImdbData(basicsFile, ratingsFile, akasFile);
         } catch (BulkIndexException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
