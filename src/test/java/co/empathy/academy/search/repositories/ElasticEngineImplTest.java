@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.empathy.academy.search.exceptions.BulkIndexException;
+import co.empathy.academy.search.models.Aka;
 import co.empathy.academy.search.models.Movie;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,12 +23,17 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 class ElasticEngineImplTest {
 
+    private final List<Aka> akas = new ArrayList<>() {{
+        add(new Aka("title", "region", "language", true));
+    }};
     ElasticsearchClient client = mock(ElasticsearchClient.class);
-
     Movie movie1 = new Movie("tconst1", "titleType1", "primaryTitle1",
-            "originalTitle1", false, 0, 0, 0, "genres1");
+            "originalTitle1", false, 0, 0, 0,
+            new String[]{"genres1"}, 5.0, 10, akas);
     Movie movie2 = new Movie("tconst2", "titleType2", "primaryTitle2",
-            "originalTitle2", false, 0, 0, 0, "genres2");
+            "originalTitle2", false, 0, 0, 0,
+            new String[]{"genres2"}, 5.0, 10, akas);
+
     List<Movie> movies = new ArrayList<>() {{
         add(movie1);
         add(movie2);

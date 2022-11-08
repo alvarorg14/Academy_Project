@@ -1,6 +1,7 @@
 package co.empathy.academy.search.controllers;
 
 import co.empathy.academy.search.exceptions.BulkIndexException;
+import co.empathy.academy.search.models.Aka;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.services.IndexService;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -18,11 +21,24 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class IndexControllerTest {
 
+    private final List<Aka> akas = new ArrayList<>() {{
+        add(new Aka("title", "region", "language", true));
+    }};
     private final Movie movie1 = new Movie("tconst1", "titleType1", "primaryTitle1",
-            "originalTitle1", false, 0, 0, 0, "genres1");
+            "originalTitle1", false, 0, 0, 0, new String[]{"genres1"},
+            5.0, 10, akas);
+
+    private final MultipartFile basicsFile = new MockMultipartFile("basics", "basics.txt",
+            "text/plain", "basics".getBytes());
+    private final MultipartFile ratingsFile = new MockMultipartFile("ratings", "ratings.txt",
+            "text/plain", "rating".getBytes());
+
+    private final MultipartFile akasFile = new MockMultipartFile("akas", "akas.txt",
+            "text/plain", "akas".getBytes());
     private final int EXPECTED_SUCCESS_CODE = 200;
     private final int EXPECTED_BAD_REQUEST_CODE = 400;
     private final int EXPECTED_ERROR_CODE = 500;
+
     IndexService service = mock(IndexService.class);
 
     @Test
@@ -66,31 +82,28 @@ class IndexControllerTest {
 
     @Test
     void givenFile_whenIndexImdbData_thenDataIndexed() throws BulkIndexException, IOException {
-        MultipartFile file = new MockMultipartFile("file", "filename.txt", "text/plain", "data".getBytes());
-        doNothing().when(service).indexImdbData(file);
+        doNothing().when(service).indexImdbData(basicsFile, ratingsFile, akasFile);
 
         IndexController controller = new IndexController(service);
-        ResponseEntity<String> response = controller.indexImdbData(file);
+        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile);
         assertEquals(202, response.getStatusCodeValue());
     }
 
     @Test
     void givenFile_whenIndexImdbData_thenBulkIndexException() throws BulkIndexException, IOException {
-        MultipartFile file = new MockMultipartFile("file", "filename.txt", "text/plain", "data".getBytes());
-        doThrow(BulkIndexException.class).when(service).indexImdbData(file);
+        doThrow(BulkIndexException.class).when(service).indexImdbData(basicsFile, ratingsFile, akasFile);
 
         IndexController controller = new IndexController(service);
-        ResponseEntity<String> response = controller.indexImdbData(file);
+        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile);
         assertEquals(EXPECTED_BAD_REQUEST_CODE, response.getStatusCodeValue());
     }
 
     @Test
     void givenFile_whenIndexImdbData_thenIOException() throws BulkIndexException, IOException {
-        MultipartFile file = new MockMultipartFile("file", "filename.txt", "text/plain", "data".getBytes());
-        doThrow(IOException.class).when(service).indexImdbData(file);
+        doThrow(IOException.class).when(service).indexImdbData(basicsFile, ratingsFile, akasFile);
 
         IndexController controller = new IndexController(service);
-        ResponseEntity<String> response = controller.indexImdbData(file);
+        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile);
         assertEquals(EXPECTED_ERROR_CODE, response.getStatusCodeValue());
     }
 

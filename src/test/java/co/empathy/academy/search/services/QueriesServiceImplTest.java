@@ -1,5 +1,6 @@
 package co.empathy.academy.search.services;
 
+import co.empathy.academy.search.models.Aka;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.repositories.ElasticEngine;
@@ -26,9 +27,12 @@ class QueriesServiceImplTest {
 
     private final QueriesService queriesService = new QueriesServiceImpl(elasticLowClient, elasticEngine);
 
+    private final List<Aka> akas = new ArrayList<>() {{
+        add(new Aka("title", "region", "language", true));
+    }};
     private final Movie movie = new Movie("tTest", "testType", "testTitle",
             "testOriginalTitle", false, 0,
-            0, 100, "testGenres");
+            0, 100, new String[]{"testGenre"}, 5.0, 10, akas);
 
     @Test
     void givenQuery_whenSearch_thenQueryResponse() {

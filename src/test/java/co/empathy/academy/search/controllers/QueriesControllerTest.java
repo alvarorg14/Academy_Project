@@ -1,5 +1,6 @@
 package co.empathy.academy.search.controllers;
 
+import co.empathy.academy.search.models.Aka;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.services.QueriesService;
@@ -19,10 +20,16 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(MockitoExtension.class)
 class QueriesControllerTest {
 
+    private final List<Aka> akas = new ArrayList<>() {{
+        add(new Aka("title", "region", "language", true));
+    }};
     private final Movie movie1 = new Movie("tconst1", "titleType1", "primaryTitle1",
-            "originalTitle1", false, 0, 0, 0, "genres1");
+            "originalTitle1", false, 0, 0, 0,
+            new String[]{"genres1"}, 5.0, 10, akas);
     private final Movie movie2 = new Movie("tconst2", "titleType2", "primaryTitle2",
-            "originalTitle2", false, 0, 0, 0, "genres2");
+            "originalTitle2", false, 0, 0, 0,
+            new String[]{"genres2"}, 5.0, 10, akas);
+
     private final List<Movie> movies = new ArrayList<>() {{
         add(movie1);
         add(movie2);
