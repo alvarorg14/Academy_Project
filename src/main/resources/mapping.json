@@ -55,6 +55,14 @@
           "type": "boolean"
         }
       }
+    },
+    "directors": {
+      "type": "nested",
+      "properties": {
+        "nconst": {
+          "type": "keyword"
+        }
+      }
     }
   }
 }
