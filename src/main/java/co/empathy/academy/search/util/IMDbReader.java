@@ -1,6 +1,7 @@
 package co.empathy.academy.search.util;
 
 import co.empathy.academy.search.models.Aka;
+import co.empathy.academy.search.models.Director;
 import co.empathy.academy.search.models.Movie;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,16 +16,18 @@ public class IMDbReader {
     private final BufferedReader basicsReader;
     private final BufferedReader ratingsReader;
     private final BufferedReader akasReader;
+    private final BufferedReader crewReader;
     private final int documentsSize = 20000;
 
     private boolean hasDocuments = true;
 
 
-    public IMDbReader(MultipartFile basicsFile, MultipartFile ratingsFile, MultipartFile akasFile) {
+    public IMDbReader(MultipartFile basicsFile, MultipartFile ratingsFile, MultipartFile akasFile, MultipartFile crewFile) {
         try {
             this.basicsReader = new BufferedReader(new InputStreamReader(basicsFile.getInputStream()));
             this.ratingsReader = new BufferedReader(new InputStreamReader(ratingsFile.getInputStream()));
             this.akasReader = new BufferedReader(new InputStreamReader(akasFile.getInputStream()));
+            this.crewReader = new BufferedReader(new InputStreamReader(crewFile.getInputStream()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -37,6 +40,7 @@ public class IMDbReader {
             basicsReader.readLine();
             ratingsReader.readLine();
             akasReader.readLine();
+            crewReader.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -80,10 +84,12 @@ public class IMDbReader {
 
                 List<Aka> akas = readAkas(basics[0]);
 
+                List<Director> directors = readDirectors();
+
                 Movie movie = new Movie(basics[0], basics[1], basics[2], basics[3], basics[4].contentEquals("1"),
                         StringIntegerConversion.toInt(basics[5]), StringIntegerConversion.toInt(basics[6]),
                         StringIntegerConversion.toInt(basics[7]), StringArrayConversion.toArray(basics[8]),
-                        averageRating, numVotes, akas);
+                        averageRating, numVotes, akas, directors);
 
                 result.add(movie);
 
@@ -96,26 +102,52 @@ public class IMDbReader {
         return result;
     }
 
-    private List<Aka> readAkas(String tconst) {
+    private List<Director> readDirectors() {
+        List<Director> directors = new ArrayList<>();
+        String crewLine = null;
         try {
-            String akasLine = akasReader.readLine();
-            if (akasLine != null) {
-                String[] akas = akasLine.split("\t");
-                List<Aka> result = new ArrayList<>();
-                while (akas[0].contentEquals(tconst)) {
-                    result.add(new Aka(akas[2], akas[3], akas[4], akas[7].contentEquals("1")));
-                    akasReader.mark(1000);
-                    akasLine = akasReader.readLine();
-                    akas = akasLine.split("\t");
-                }
-                akasReader.reset(); //To prevent skipping the first line.
-                return result;
-            } else {
-                return new ArrayList<>();
-            }
+            crewLine = crewReader.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        String[] crew = crewLine.split("\t");
+        String[] directorsArray = crew[1].split(",");
+        for (String nconst : directorsArray) {
+            directors.add(new Director(nconst));
+        }
+        return directors;
+    }
+
+    private List<Aka> readAkas(String tconst) {
+        List<Aka> akas = new ArrayList<>();
+        boolean currentTconst = true;
+        try {
+            while (currentTconst) {
+                akasReader.mark(10000);
+                String akasLine = akasReader.readLine();
+                if (akasLine == null) {
+                    currentTconst = false;
+                } else {
+                    if (checkHigherTconst(tconst, akasLine.split("\t")[0])) {
+                        currentTconst = false;
+                    } else {
+                        String[] fields = akasLine.split("\t");
+                        akas.add(new Aka(fields[2], fields[3], fields[4], fields[7].contentEquals("1")));
+                    }
+                }
+            }
+            akasReader.reset();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return akas;
+    }
+
+    private boolean checkHigherTconst(String tconst, String akas) {
+        int tconstId = StringIntegerConversion.toInt(tconst.substring(2));
+        int akasId = StringIntegerConversion.toInt(akas.substring(2));
+
+        return akasId > tconstId;
     }
 
     public boolean hasDocuments() {

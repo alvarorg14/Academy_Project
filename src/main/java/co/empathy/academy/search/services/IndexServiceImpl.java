@@ -47,11 +47,13 @@ public class IndexServiceImpl implements IndexService {
      * @param basicsFile  File with the imdb basics data
      * @param ratingsFile File with the imdb ratings data
      * @param akasFile    File with the imdb akas data
+     * @param crewFile    File with the imdb crew data
      * @return True if the data was indexed correctly, false otherwise
      */
     @Override
-    public void indexImdbData(MultipartFile basicsFile, MultipartFile ratingsFile, MultipartFile akasFile) throws IOException, BulkIndexException {
-        IMDbReader reader = new IMDbReader(basicsFile, ratingsFile, akasFile);
+    public void indexImdbData(MultipartFile basicsFile, MultipartFile ratingsFile,
+                              MultipartFile akasFile, MultipartFile crewFile) throws IOException, BulkIndexException {
+        IMDbReader reader = new IMDbReader(basicsFile, ratingsFile, akasFile, crewFile);
 
         while (reader.hasDocuments()) {
             List<Movie> movies = reader.readDocuments();

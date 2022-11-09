@@ -23,4 +23,5 @@ public class Movie {
     double averageRating;
     int numVotes;
     List<Aka> akas;
+    List<Director> directors;
 }

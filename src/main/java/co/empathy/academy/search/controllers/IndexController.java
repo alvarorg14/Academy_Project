@@ -68,7 +68,8 @@ public class IndexController {
      * POST /index/imdb - Indexes imdb data in the index
      *
      * @param basicsFile  - Title basics file containing the data to be indexed
-     * @param ratingsFile - Title ratings file containing the data to be indexed
+     * @param ratingsFile - Ratings file containing the data to be indexed
+     * @oaram akasFile - Akas file containing the data to be indexed
      */
     @PostMapping("/imdb")
     @Operation(summary = "Indexes imdb data in the index")
@@ -79,9 +80,10 @@ public class IndexController {
     })
     public ResponseEntity indexImdbData(@RequestParam("basicsFile") MultipartFile basicsFile,
                                         @RequestParam("ratingsFile") MultipartFile ratingsFile,
-                                        @RequestParam("akasFile") MultipartFile akasFile) {
+                                        @RequestParam("akasFile") MultipartFile akasFile,
+                                        @RequestParam("crewFile") MultipartFile crewFile) {
         try {
-            indexService.indexImdbData(basicsFile, ratingsFile, akasFile);
+            indexService.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile);
         } catch (BulkIndexException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {

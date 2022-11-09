@@ -37,7 +37,6 @@ public class ElasticEngineImpl implements ElasticEngine {
         } catch (Exception e) {
             // Ignore
         }
-
         client.indices().create(c -> c.index(INDEX_NAME));
     }
 
