@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface QueriesService {
 
+    void makeAggsQuery() throws IOException;
+
     QueryResponse search(String query);
 
     /**

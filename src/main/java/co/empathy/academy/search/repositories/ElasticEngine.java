@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface ElasticEngine {
 
+    void makeAggsQuery() throws IOException;
+
     /**
      * Creates an index using the elastic client
      *

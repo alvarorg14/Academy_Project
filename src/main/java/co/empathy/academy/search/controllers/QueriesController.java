@@ -103,4 +103,12 @@ public class QueriesController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    /**
+     * GET /aggs
+     */
+    @GetMapping(value = "/aggs", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void aggs() throws IOException {
+        queriesService.makeAggsQuery();
+    }
 }

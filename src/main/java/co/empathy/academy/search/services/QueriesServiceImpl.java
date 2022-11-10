@@ -21,6 +21,11 @@ public class QueriesServiceImpl implements QueriesService {
         this.elasticEngine = elasticEngine;
     }
 
+    @Override
+    public void makeAggsQuery() throws IOException {
+        elasticEngine.makeAggsQuery();
+    }
+
     /**
      * Makes a request to obtain the cluster name and returns it and the query performed.
      *
