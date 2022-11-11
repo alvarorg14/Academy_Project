@@ -2,7 +2,7 @@ package co.empathy.academy.search.controllers;
 
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
-import co.empathy.academy.search.services.QueriesService;
+import co.empathy.academy.search.services.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,15 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/search")
 public class QueriesController {
 
-    private final QueriesService queriesService;
+    private final SearchService searchService;
 
-    public QueriesController(QueriesService queriesService) {
-        this.queriesService = queriesService;
+    public QueriesController(SearchService searchService) {
+        this.searchService = searchService;
     }
 
     /**
@@ -36,9 +37,9 @@ public class QueriesController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
     })
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/info", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<QueryResponse> search(@RequestParam("query") String query) {
-        return ResponseEntity.ok(queriesService.search(query));
+        return ResponseEntity.ok(searchService.search(query));
     }
 
     /**
@@ -56,7 +57,7 @@ public class QueriesController {
     @GetMapping(value = "/multi", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Movie>> multiMatch(@RequestParam("query") String query, @RequestParam("fields") String fields) {
         try {
-            return ResponseEntity.ok(queriesService.multiMatch(query, fields));
+            return ResponseEntity.ok(searchService.multiMatch(query, fields));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -77,7 +78,7 @@ public class QueriesController {
     @GetMapping(value = "/term", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Movie>> termQuery(@RequestParam("value") String value, @RequestParam("field") String field) {
         try {
-            return ResponseEntity.ok().body(queriesService.termQuery(value, field));
+            return ResponseEntity.ok().body(searchService.termQuery(value, field));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -98,8 +99,50 @@ public class QueriesController {
     @GetMapping(value = "/terms", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Movie>> termsQuery(@RequestParam("values") String values, @RequestParam("field") String field) {
         try {
-            return ResponseEntity.ok().body(queriesService.termsQuery(values, field));
+            return ResponseEntity.ok().body(searchService.termsQuery(values, field));
         } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /*
+    /**
+     * GET /aggs
+
+    @GetMapping(value = "/aggs", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void aggs() throws IOException {
+        searchService.makeAggsQuery();
+    }*/
+
+    /**
+     * GET /search - Performs a search with all the filters
+     *
+     * @param genres     Genres to search
+     * @param types      Types to search
+     * @param maxYear    Maximum year to search
+     * @param minYear    Minimum year to search
+     * @param maxMinutes Maximum runtime minutes
+     * @param minMinutes Minimum runtime minutes
+     * @param maxScore   Maximum average rating
+     * @param minScore   Minimum average rating
+     * @return List of movies that match the filters
+     */
+    @Operation(summary = "Get movies by a basic filters query")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Movie>> allFiltersSearch(@RequestParam("genres") Optional<String> genres,
+                                                        @RequestParam("types") Optional<String> types,
+                                                        @RequestParam("maxYear") Optional<Integer> maxYear,
+                                                        @RequestParam("minYear") Optional<Integer> minYear,
+                                                        @RequestParam("maxMinutes") Optional<Integer> maxMinutes,
+                                                        @RequestParam("minMinutes") Optional<Integer> minMinutes,
+                                                        @RequestParam("maxScore") Optional<Double> maxScore,
+                                                        @RequestParam("minScore") Optional<Double> minScore) {
+        try {
+            List<Movie> movies = searchService.allFiltersSearch(genres, types, maxYear, minYear,
+                    maxMinutes, minMinutes, maxScore, minScore);
+            return ResponseEntity.ok(movies);
+        } catch (IOException e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }

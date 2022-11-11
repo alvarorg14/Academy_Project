@@ -1,39 +1,71 @@
 package co.empathy.academy.search.services;
 
-import co.empathy.academy.search.models.Movie;
-import co.empathy.academy.search.models.QueryResponse;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface QueriesService {
 
-    QueryResponse search(String query);
-
     /**
-     * Performs a multi match query to the movies index
+     * Creates a multi match query
      *
      * @param query  - query to search
      * @param fields - fields to search
-     * @return List of movies
+     * @return Query to be executed
      */
-    List<Movie> multiMatch(String query, String fields) throws IOException;
+    Query multiMatch(String query, String[] fields);
 
     /**
-     * Performs a term query to the movies index
+     * Performs a term query
      *
-     * @param value - value to search
      * @param field - field to search
-     * @return List of movies
+     * @param value - value to search
+     * @return Query to be executed
      */
-    List<Movie> termQuery(String value, String field) throws IOException;
+    Query termQuery(String value, String field);
 
     /**
-     * Performs a terms query to the movies index
+     * Performs a terms query
      *
-     * @param values - values to search
-     * @param field  - field to search
-     * @return List of movies
+     * @param values Values to search
+     * @param field  Field to search
+     * @return Query to be executed
      */
-    List<Movie> termsQuery(String values, String field) throws IOException;
+    Query termsQuery(String[] values, String field);
+
+    /**
+     * Creates a bool query
+     *
+     * @param queries List of queries to be executed
+     * @return Query to be executed
+     */
+    Query boolQuery(List<Query> queries);
+
+    /**
+     * Creates a should query
+     *
+     * @param queries List of queries to be executed
+     * @return Query to be executed
+     */
+    Query shouldQuery(List<Query> queries);
+
+    /**
+     * Creates a range double query
+     *
+     * @param field Field to search
+     * @param min   Min value
+     * @param max   Max value
+     * @return Query to be executed
+     */
+    Query rangeDoubleQuery(String field, Double min, Double max);
+
+    /**
+     * Creates a range integer query
+     *
+     * @param field Field to search
+     * @param min   Min value
+     * @param max   Max value
+     * @return Query to be executed
+     */
+    Query rangeIntegerQuery(String field, Integer min, Integer max);
 }

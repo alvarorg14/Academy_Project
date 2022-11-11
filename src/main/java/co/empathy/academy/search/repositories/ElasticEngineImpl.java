@@ -1,8 +1,7 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -12,9 +11,7 @@ import co.empathy.academy.search.models.Movie;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ElasticEngineImpl implements ElasticEngine {
 
@@ -23,6 +20,76 @@ public class ElasticEngineImpl implements ElasticEngine {
 
     public ElasticEngineImpl(ElasticsearchClient client) {
         this.client = client;
+    }
+
+    /*
+    @Override
+    public void makeAggsQuery() throws IOException {
+        Query query = BoolQuery.of(b -> b
+                .filter(multiMatch("avengers", new String[]{"primaryTitle"})))._toQuery();
+
+        Aggregation genres = TermsAggregation.of(t -> t.field("genres").size(100))._toAggregation();
+        Aggregation types = TermsAggregation.of(t -> t.field("titleType").size(100))._toAggregation();
+
+        Aggregation ranking = RangeAggregation.of(r -> r.field("averageRating").ranges(
+                AggregationRange.of(a -> a.key("No ranking").from("0.0").to("0.0001")),
+                AggregationRange.of(a -> a.key("0.0-2.0").from("0.1").to("2.0")),
+                AggregationRange.of(a -> a.key("2.0-4.0").from("2.0").to("4.0")),
+                AggregationRange.of(a -> a.key("4.0-6.0").from("4.0").to("6.0")),
+                AggregationRange.of(a -> a.key("6.0-8.0").from("6.0").to("8.0")),
+                AggregationRange.of(a -> a.key("8.0-10.0").from("8.0").to("10.0"))
+        ))._toAggregation();
+
+        Map<String, Aggregation> aggs = new HashMap<String, Aggregation>();
+        aggs.put("genres", genres);
+        aggs.put("types", types);
+        aggs.put("ranking", ranking);
+
+        SearchResponse<Movie> response = client.search(b -> b
+                .index(INDEX_NAME)
+                .size(100)
+                .query(query)
+                .aggregations(aggs), Movie.class);
+
+        //Print the movies
+        System.out.println("Movies:");
+        for (Hit<Movie> hit : response.hits().hits()) {
+            System.out.println(hit.source());
+        }
+
+        System.out.println("Genres");
+        Aggregate genresAgg = response.aggregations().get("genres");
+        genresAgg.sterms().buckets().array().forEach(bucket -> {
+            System.out.println(bucket.key() + " " + bucket.docCount());
+        });
+        System.out.println("Types");
+        response.aggregations().get("types").sterms().buckets().array().forEach(bucket -> {
+            System.out.println(bucket.key() + " " + bucket.docCount());
+        });
+        System.out.println("Ranking");
+        response.aggregations().get("ranking").range().buckets().array().forEach(bucket -> {
+            System.out.println(bucket.key() + " " + bucket.docCount());
+        });
+    }*/
+
+
+    /**
+     * Performs a query to elasticsearch
+     *
+     * @param query Query to make
+     * @return List of movies that match the query
+     */
+    @Override
+    public List<Movie> performQuery(Query query) throws IOException {
+        SearchResponse<Movie> response = client.search(s -> s
+                .index(INDEX_NAME)
+                .query(query)
+                .size(100), Movie.class);
+
+        return response.hits().hits().stream()
+                .map(Hit::source)
+                .toList();
+
     }
 
     /**
@@ -80,75 +147,6 @@ public class ElasticEngineImpl implements ElasticEngine {
                 .document(movie));
     }
 
-    /**
-     * Creates a multimatch query
-     *
-     * @param query  - query to search
-     * @param fields - fields to search
-     * @return Query
-     */
-    @Override
-    public Query multiMatch(String query, String[] fields) {
-        Query multiMatchQuery = MultiMatchQuery.of(m -> m
-                .query(query)
-                .fields(Arrays.stream(fields).toList()))._toQuery();
-
-        return multiMatchQuery;
-    }
-
-    /**
-     * Creates a term query
-     *
-     * @param field Field to search
-     * @param value Value to search
-     * @return Query
-     */
-    @Override
-    public Query termQuery(String value, String field) {
-        Query termQuery = TermQuery.of(t -> t
-                .value(value)
-                .field(field))._toQuery();
-
-        return termQuery;
-    }
-
-    /**
-     * Creates a terms query
-     *
-     * @param values Values to search
-     * @param field  Field to search
-     * @return Query
-     */
-    @Override
-    public Query termsQuery(String[] values, String field) {
-        TermsQueryField termsQueryField = TermsQueryField.of(t -> t
-                .value(Arrays.stream(values).toList().stream().map(FieldValue::of).collect(Collectors.toList())));
-
-        Query termsQuery = TermsQuery.of(t -> t
-                .field(field)
-                .terms(termsQueryField))._toQuery();
-
-        return termsQuery;
-    }
-
-    /**
-     * Performs a query to elasticsearch
-     *
-     * @param query Query to make
-     * @return List of movies that match the query
-     */
-    @Override
-    public List<Movie> performQuery(Query query) throws IOException {
-        SearchResponse<Movie> response = client.search(s -> s
-                .index(INDEX_NAME)
-                .query(query)
-                .size(100), Movie.class);
-
-        return response.hits().hits().stream()
-                .map(Hit::source)
-                .toList();
-
-    }
 
     /**
      * Indexes a list of movies

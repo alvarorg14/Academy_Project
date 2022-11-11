@@ -1,80 +1,119 @@
 package co.empathy.academy.search.services;
 
-import co.empathy.academy.search.models.Movie;
-import co.empathy.academy.search.models.QueryResponse;
-import co.empathy.academy.search.repositories.ElasticEngine;
-import co.empathy.academy.search.repositories.ElasticLowClient;
-import org.apache.tomcat.util.json.JSONParser;
-import org.apache.tomcat.util.json.ParseException;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.json.JsonData;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QueriesServiceImpl implements QueriesService {
 
-    private final ElasticLowClient elasticLowClient;
-
-    private final ElasticEngine elasticEngine;
-
-    public QueriesServiceImpl(ElasticLowClient elasticLowClient, ElasticEngine elasticEngine) {
-        this.elasticLowClient = elasticLowClient;
-        this.elasticEngine = elasticEngine;
-    }
-
     /**
-     * Makes a request to obtain the cluster name and returns it and the query performed.
-     *
-     * @param query
-     * @return QueryResponse
-     */
-    @Override
-    public QueryResponse search(String query) {
-        String elasticInfo = elasticLowClient.getElasticInfo();
-        //Parse the json above to obtain the cluster name
-        String clusterName = "";
-        try {
-            clusterName = new JSONParser(elasticInfo).parseObject().get("cluster_name").toString();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-        return new QueryResponse(query, clusterName);
-    }
-
-    /**
-     * Performs a multi match query to the movies index
+     * Creates a multimatch query
      *
      * @param query  - query to search
      * @param fields - fields to search
-     * @return List of movies
+     * @return Query
      */
     @Override
-    public List<Movie> multiMatch(String query, String fields) throws IOException {
-        String[] fieldsArray = fields.split(",");
-        return elasticEngine.performQuery(elasticEngine.multiMatch(query, fieldsArray));
+    public Query multiMatch(String query, String[] fields) {
+        Query multiMatchQuery = MultiMatchQuery.of(m -> m
+                .query(query)
+                .fields(Arrays.stream(fields).toList()))._toQuery();
+
+        return multiMatchQuery;
     }
 
     /**
-     * Performs a term query to the movies index
+     * Creates a term query
      *
-     * @param value - value to search
-     * @param field - field to search
-     * @return List of movies
+     * @param field Field to search
+     * @param value Value to search
+     * @return Query
      */
     @Override
-    public List<Movie> termQuery(String value, String field) throws IOException {
-        return elasticEngine.performQuery(elasticEngine.termQuery(value, field));
+    public Query termQuery(String value, String field) {
+        Query termQuery = TermQuery.of(t -> t
+                .value(value)
+                .field(field))._toQuery();
+
+        return termQuery;
     }
 
     /**
-     * Performs a terms query to the movies index
+     * Creates a terms query
      *
-     * @param values - values to search
-     * @param field  - field to search
-     * @return List of movies
+     * @param values Values to search
+     * @param field  Field to search
+     * @return Query
      */
     @Override
-    public List<Movie> termsQuery(String values, String field) throws IOException {
-        String[] valuesArray = values.split(",");
-        return elasticEngine.performQuery(elasticEngine.termsQuery(valuesArray, field));
+    public Query termsQuery(String[] values, String field) {
+        TermsQueryField termsQueryField = TermsQueryField.of(t -> t
+                .value(Arrays.stream(values).toList().stream().map(FieldValue::of).collect(Collectors.toList())));
+
+        Query termsQuery = TermsQuery.of(t -> t
+                .field(field)
+                .terms(termsQueryField))._toQuery();
+
+        return termsQuery;
+    }
+
+    /**
+     * Creates a bool query
+     *
+     * @param queries List of queries to be executed
+     * @return Query to be executed
+     */
+    @Override
+    public Query boolQuery(List<Query> queries) {
+        Query boolQuery = BoolQuery.of(b -> b.filter(queries))._toQuery();
+        return boolQuery;
+    }
+
+    /**
+     * Creates a should query
+     *
+     * @param queries List of queries to be executed
+     * @return Query to be executed
+     */
+    @Override
+    public Query shouldQuery(List<Query> queries) {
+        Query shouldQuery = BoolQuery.of(b -> b.should(queries))._toQuery();
+        return shouldQuery;
+    }
+
+    /**
+     * Creates a range double filter
+     *
+     * @param field Field to search
+     * @param min   Min value
+     * @param max   Max value
+     * @return Query to be executed
+     */
+    @Override
+    public Query rangeDoubleQuery(String field, Double min, Double max) {
+        return RangeQuery.of(r -> r
+                .field(field)
+                .gte(JsonData.of(min))
+                .lte(JsonData.of(max)))._toQuery();
+    }
+
+    /**
+     * Creates a range integer filter
+     *
+     * @param field Field to search
+     * @param min   Min value
+     * @param max   Max value
+     * @return Query to be executed
+     */
+    @Override
+    public Query rangeIntegerQuery(String field, Integer min, Integer max) {
+        return RangeQuery.of(r -> r
+                .field(field)
+                .gte(JsonData.of(min))
+                .lte(JsonData.of(max)))._toQuery();
     }
 }
