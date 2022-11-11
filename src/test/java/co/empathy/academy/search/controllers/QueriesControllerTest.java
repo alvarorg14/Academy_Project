@@ -2,7 +2,7 @@ package co.empathy.academy.search.controllers;
 
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
-import co.empathy.academy.search.services.QueriesService;
+import co.empathy.academy.search.services.SearchService;
 import co.empathy.academy.search.util.ResourcesUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ class QueriesControllerTest {
 
     private final List<Movie> movies = ResourcesUtil.getMovies();
 
-    private final QueriesService service = mock(QueriesService.class);
+    private final SearchService service = mock(SearchService.class);
     private final int EXPECTED_SUCCESS_STATUS = 200;
     private final int EXPECTED_ERROR_STATUS = 500;
     private final String query = "query";

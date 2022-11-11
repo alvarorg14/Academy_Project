@@ -1,9 +1,7 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.aggregations.*;
-import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -13,11 +11,7 @@ import co.empathy.academy.search.models.Movie;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ElasticEngineImpl implements ElasticEngine {
 
@@ -28,6 +22,7 @@ public class ElasticEngineImpl implements ElasticEngine {
         this.client = client;
     }
 
+    /*
     @Override
     public void makeAggsQuery() throws IOException {
         Query query = BoolQuery.of(b -> b
@@ -75,58 +70,8 @@ public class ElasticEngineImpl implements ElasticEngine {
         response.aggregations().get("ranking").range().buckets().array().forEach(bucket -> {
             System.out.println(bucket.key() + " " + bucket.docCount());
         });
-    }
+    }*/
 
-    /**
-     * Creates a multimatch query
-     *
-     * @param query  - query to search
-     * @param fields - fields to search
-     * @return Query
-     */
-    @Override
-    public Query multiMatch(String query, String[] fields) {
-        Query multiMatchQuery = MultiMatchQuery.of(m -> m
-                .query(query)
-                .fields(Arrays.stream(fields).toList()))._toQuery();
-
-        return multiMatchQuery;
-    }
-
-    /**
-     * Creates a term query
-     *
-     * @param field Field to search
-     * @param value Value to search
-     * @return Query
-     */
-    @Override
-    public Query termQuery(String value, String field) {
-        Query termQuery = TermQuery.of(t -> t
-                .value(value)
-                .field(field))._toQuery();
-
-        return termQuery;
-    }
-
-    /**
-     * Creates a terms query
-     *
-     * @param values Values to search
-     * @param field  Field to search
-     * @return Query
-     */
-    @Override
-    public Query termsQuery(String[] values, String field) {
-        TermsQueryField termsQueryField = TermsQueryField.of(t -> t
-                .value(Arrays.stream(values).toList().stream().map(FieldValue::of).collect(Collectors.toList())));
-
-        Query termsQuery = TermsQuery.of(t -> t
-                .field(field)
-                .terms(termsQueryField))._toQuery();
-
-        return termsQuery;
-    }
 
     /**
      * Performs a query to elasticsearch
