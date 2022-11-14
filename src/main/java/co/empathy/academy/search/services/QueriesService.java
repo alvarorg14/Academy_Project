@@ -25,6 +25,15 @@ public interface QueriesService {
     Query termQuery(String value, String field);
 
     /**
+     * Creates a list of term queries
+     *
+     * @param values - values to search
+     * @param field  - field to search
+     * @return List of term queries
+     */
+    List<Query> termQueries(String[] values, String field);
+
+    /**
      * Performs a terms query
      *
      * @param values Values to search
