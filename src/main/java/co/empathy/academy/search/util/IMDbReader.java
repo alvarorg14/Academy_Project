@@ -128,7 +128,7 @@ public class IMDbReader {
                 if (akasLine == null) {
                     currentTconst = false;
                 } else {
-                    if (checkHigherTconst(tconst, akasLine.split("\t")[0])) {
+                    if (checkHigherTconst(tconst, akasLine.split("\t")[0]) || tconst.length() != akasLine.split("\t")[0].length()) {
                         currentTconst = false;
                     } else {
                         String[] fields = akasLine.split("\t");
