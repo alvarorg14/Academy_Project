@@ -2,6 +2,7 @@ package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
+import co.empathy.academy.search.models.facets.Facet;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,4 +60,12 @@ public interface SearchService {
                                  Optional<Integer> maxYear, Optional<Integer> minYear,
                                  Optional<Integer> maxRuntime, Optional<Integer> minRuntime,
                                  Optional<Double> maxScore, Optional<Double> minScore) throws IOException;
+
+    /**
+     * Performs a search to get the genres aggregation
+     *
+     * @return Facet with the genres aggregation
+     * @throws IOException
+     */
+    Facet getGenresAggregation() throws IOException;
 }

@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -108,6 +109,27 @@ class SearchServiceImplTest {
         assertEquals(movie, movies.get(0));
 
         verify(queriesService, times(1)).termsQuery(queries.split(","), field);
+        verify(elasticEngine, times(1)).performQuery(any());
+    }
+
+    @Test
+    void givenAllFilters_whenAllFiltersSearch_thenMoviesReturned() throws IOException {
+        given(elasticEngine.performQuery(any())).willReturn(new ArrayList<Movie>() {{
+            add(movie);
+        }});
+
+        List<Movie> movies = searchService.allFiltersSearch(Optional.of("genre1,genre2"),
+                Optional.of("type1,type2"), Optional.of(2017), Optional.of(2016),
+                Optional.of(90), Optional.of(0), Optional.of(10.0), Optional.of(5.0));
+
+        assertEquals(1, movies.size());
+        assertEquals(movie, movies.get(0));
+
+        verify(queriesService, times(2)).termQueries(any(), any());
+        verify(queriesService, times(2)).rangeIntegerQuery(any(), any(), any());
+        verify(queriesService, times(1)).rangeDoubleQuery(any(), any(), any());
+        verify(queriesService, times(2)).shouldQuery(any());
+        verify(queriesService, times(1)).boolQuery(any());
         verify(elasticEngine, times(1)).performQuery(any());
     }
 }

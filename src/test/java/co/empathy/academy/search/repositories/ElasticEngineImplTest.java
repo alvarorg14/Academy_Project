@@ -53,5 +53,4 @@ class ElasticEngineImplTest {
         assertThrows(IOException.class, () -> new ElasticEngineImpl(client).indexBulk(movies));
     }
 
-
 }

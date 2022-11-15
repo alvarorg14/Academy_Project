@@ -3,6 +3,7 @@ package co.empathy.academy.search.services;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
+import co.empathy.academy.search.models.facets.Facet;
 import co.empathy.academy.search.repositories.ElasticEngine;
 import co.empathy.academy.search.repositories.ElasticLowClient;
 import org.apache.tomcat.util.json.JSONParser;
@@ -10,7 +11,6 @@ import org.apache.tomcat.util.json.ParseException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,21 +114,14 @@ public class SearchServiceImpl implements SearchService {
         List<Query> filters = new ArrayList<>();
 
         if (genres.isPresent()) {
-            //Create a should query, genre1 or genre2 or genre3
             String[] genresArray = genres.get().split(",");
-            List<Query> genreQueries = new ArrayList<>();
-            Arrays.stream(genresArray).toList().forEach(genre -> {
-                genreQueries.add(queriesService.termQuery(genre, "genres"));
-            });
+            List<Query> genreQueries = queriesService.termQueries(genresArray, "genres");
             filters.add(queriesService.shouldQuery(genreQueries));
         }
 
         if (types.isPresent()) {
             String[] typesArray = types.get().split(",");
-            List<Query> typeQueries = new ArrayList<>();
-            Arrays.stream(typesArray).toList().forEach(type -> {
-                typeQueries.add(queriesService.termQuery(type, "titleType"));
-            });
+            List<Query> typeQueries = queriesService.termQueries(typesArray, "titleType");
             filters.add(queriesService.shouldQuery(typeQueries));
         }
 
@@ -149,4 +142,17 @@ public class SearchServiceImpl implements SearchService {
 
         return elasticEngine.performQuery(queriesService.boolQuery(filters));
     }
+
+    /**
+     * Performs a search to get the genres aggregation
+     *
+     * @return Facet with the genres aggregation
+     * @throws IOException
+     */
+    @Override
+    public Facet getGenresAggregation() throws IOException {
+        return elasticEngine.getGenresAggregation();
+    }
+
+
 }

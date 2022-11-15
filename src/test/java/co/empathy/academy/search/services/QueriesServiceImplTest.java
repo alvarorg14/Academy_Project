@@ -4,9 +4,9 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class QueriesServiceImplTest {
 
@@ -73,5 +73,15 @@ class QueriesServiceImplTest {
         assertNotNull(result);
         assertTrue(result.isRange());
     }
+
+    @Test
+    void givenFieldAndValues_whenTermQueries_thenListQueriesFormed() {
+        List<Query> result = queriesService.termQueries(new String[]{query, "query2"}, field);
+
+        assertEquals(2, result.size());
+        assertTrue(result.get(0).isTerm());
+        assertTrue(result.get(1).isTerm());
+    }
+
 
 }

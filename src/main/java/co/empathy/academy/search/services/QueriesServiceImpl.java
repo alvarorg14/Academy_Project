@@ -43,6 +43,22 @@ public class QueriesServiceImpl implements QueriesService {
     }
 
     /**
+     * Creates a list of term queries
+     *
+     * @param values - values to search
+     * @param field  - field to search
+     * @return List of term queries
+     */
+    @Override
+    public List<Query> termQueries(String[] values, String field) {
+        List<Query> termQueries = Arrays.stream(values)
+                .map(value -> termQuery(value, field))
+                .collect(Collectors.toList());
+
+        return termQueries;
+    }
+
+    /**
      * Creates a terms query
      *
      * @param values Values to search

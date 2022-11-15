@@ -2,6 +2,8 @@ package co.empathy.academy.search.controllers;
 
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
+import co.empathy.academy.search.models.SearchResponse;
+import co.empathy.academy.search.models.facets.Facet;
 import co.empathy.academy.search.services.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,15 +108,6 @@ public class QueriesController {
         }
     }
 
-    /*
-    /**
-     * GET /aggs
-
-    @GetMapping(value = "/aggs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void aggs() throws IOException {
-        searchService.makeAggsQuery();
-    }*/
-
     /**
      * GET /search - Performs a search with all the filters
      *
@@ -129,20 +123,43 @@ public class QueriesController {
      */
     @Operation(summary = "Get movies by a basic filters query")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Movie>> allFiltersSearch(@RequestParam("genres") Optional<String> genres,
-                                                        @RequestParam("types") Optional<String> types,
-                                                        @RequestParam("maxYear") Optional<Integer> maxYear,
-                                                        @RequestParam("minYear") Optional<Integer> minYear,
-                                                        @RequestParam("maxMinutes") Optional<Integer> maxMinutes,
-                                                        @RequestParam("minMinutes") Optional<Integer> minMinutes,
-                                                        @RequestParam("maxScore") Optional<Double> maxScore,
-                                                        @RequestParam("minScore") Optional<Double> minScore) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of movies found, it can be empty"),
+            @ApiResponse(responseCode = "500", description = "Error searching the movies")
+    })
+    public ResponseEntity<SearchResponse> allFiltersSearch(@RequestParam("genres") Optional<String> genres,
+                                                           @RequestParam("types") Optional<String> types,
+                                                           @RequestParam("maxYear") Optional<Integer> maxYear,
+                                                           @RequestParam("minYear") Optional<Integer> minYear,
+                                                           @RequestParam("maxMinutes") Optional<Integer> maxMinutes,
+                                                           @RequestParam("minMinutes") Optional<Integer> minMinutes,
+                                                           @RequestParam("maxScore") Optional<Double> maxScore,
+                                                           @RequestParam("minScore") Optional<Double> minScore) {
         try {
             List<Movie> movies = searchService.allFiltersSearch(genres, types, maxYear, minYear,
                     maxMinutes, minMinutes, maxScore, minScore);
-            return ResponseEntity.ok(movies);
+            return ResponseEntity.ok(new SearchResponse(movies, new ArrayList<>()));
         } catch (IOException e) {
-            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * GET /search/genres - Returns an aggregation of the genres
+     */
+    @Operation(summary = "Get genres aggregation")
+    @GetMapping(value = "/genres", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Genres found"),
+            @ApiResponse(responseCode = "500", description = "Error searching the genres")
+    })
+    public ResponseEntity<SearchResponse> genresSearch() {
+        try {
+            List<Facet> facets = new ArrayList<>() {{
+                add(searchService.getGenresAggregation());
+            }};
+            return ResponseEntity.ok(new SearchResponse(new ArrayList<>(), facets));
+        } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
