@@ -43,6 +43,7 @@ public class IndexController {
         return ResponseEntity.ok("Index created");
     }
 
+
     /**
      * POST /index - Indexes a new document
      *
