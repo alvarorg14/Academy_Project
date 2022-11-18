@@ -86,7 +86,11 @@ public class IMDbReader {
                 }
 
                 basicsReader.mark(1000);
-                String nextBasicsId = basicsReader.readLine().split("\t")[0];
+                String nextBasicsId = null;
+                String nextLine = basicsReader.readLine();
+                if (nextLine != null) {
+                    nextBasicsId = nextLine.split("\t")[0];
+                }
                 basicsReader.reset();
                 List<Aka> akas = readAkas(basics[0], nextBasicsId);
 
@@ -147,7 +151,7 @@ public class IMDbReader {
                 }
             }
             akasReader.reset();
-            if (!checkEqualIds(basicsId, nextBasicsId)) {
+            if (nextBasicsId != null && !checkEqualIds(basicsId, nextBasicsId)) {
                 readUntilNextId(basicsId);
             }
         } catch (IOException e) {
