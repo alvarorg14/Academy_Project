@@ -131,6 +131,7 @@ class SearchServiceImplTest {
         verify(queriesService, times(1)).rangeDoubleQuery(any(), any(), any());
         verify(queriesService, times(2)).shouldQuery(any());
         verify(queriesService, times(1)).boolQuery(any());
+        verify(queriesService, times(2)).sort(any(), any());
         verify(elasticEngine, times(1)).performQuery(any(), any(), any());
     }
 }
