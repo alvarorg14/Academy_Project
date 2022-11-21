@@ -35,15 +35,16 @@ public class ElasticEngineImpl implements ElasticEngine {
     /**
      * Performs a query to elasticsearch
      *
-     * @param query Query to make
+     * @param query    Query to make
+     * @param maxNHits Maximum number of hits to return
      * @return List of movies that match the query
      */
     @Override
-    public List<Movie> performQuery(Query query) throws IOException {
+    public List<Movie> performQuery(Query query, Integer maxNHits) throws IOException {
         SearchResponse<Movie> response = client.search(s -> s
                 .index(INDEX_NAME)
                 .query(query)
-                .size(1000), Movie.class);
+                .size(maxNHits), Movie.class);
 
         return response.hits().hits().stream()
                 .map(Hit::source)

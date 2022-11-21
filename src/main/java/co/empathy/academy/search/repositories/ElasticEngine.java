@@ -44,10 +44,11 @@ public interface ElasticEngine {
     /**
      * Makes a query to elasticsearch
      *
-     * @param query Query to make
+     * @param query    Query to make
+     * @param maxNHits Maximum number of hits to return
      * @return List of movies that match the query
      */
-    List<Movie> performQuery(Query query) throws IOException;
+    List<Movie> performQuery(Query query, Integer maxNHits) throws IOException;
 
     /**
      * Indexes a list of movies

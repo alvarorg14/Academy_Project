@@ -63,7 +63,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Movie> multiMatch(String query, String fields) throws IOException {
         String[] fieldsArray = fields.split(",");
-        return elasticEngine.performQuery(queriesService.multiMatch(query, fieldsArray));
+        return elasticEngine.performQuery(queriesService.multiMatch(query, fieldsArray), 100);
     }
 
     /**
@@ -75,7 +75,7 @@ public class SearchServiceImpl implements SearchService {
      */
     @Override
     public List<Movie> termQuery(String value, String field) throws IOException {
-        return elasticEngine.performQuery(queriesService.termQuery(value, field));
+        return elasticEngine.performQuery(queriesService.termQuery(value, field), 100);
     }
 
     /**
@@ -88,7 +88,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Movie> termsQuery(String values, String field) throws IOException {
         String[] valuesArray = values.split(",");
-        return elasticEngine.performQuery(queriesService.termsQuery(valuesArray, field));
+        return elasticEngine.performQuery(queriesService.termsQuery(valuesArray, field), 100);
     }
 
     /**
@@ -102,6 +102,7 @@ public class SearchServiceImpl implements SearchService {
      * @param minRuntime Minimum runtime minutes
      * @param maxScore   Maximum average rating
      * @param minScore   Minimum average rating
+     * @param maxNHits   Maximum number of hits
      * @return List of movies that match the filters
      * @throws IOException
      */
@@ -109,7 +110,8 @@ public class SearchServiceImpl implements SearchService {
     public List<Movie> allFiltersSearch(Optional<String> genres, Optional<String> types,
                                         Optional<Integer> maxYear, Optional<Integer> minYear,
                                         Optional<Integer> maxRuntime, Optional<Integer> minRuntime,
-                                        Optional<Double> maxScore, Optional<Double> minScore) throws IOException {
+                                        Optional<Double> maxScore, Optional<Double> minScore,
+                                        Optional<Integer> maxNHits) throws IOException {
 
         List<Query> filters = new ArrayList<>();
 
@@ -140,7 +142,8 @@ public class SearchServiceImpl implements SearchService {
                     maxScore.isPresent() ? maxScore.get() : Double.MAX_VALUE));
         }
 
-        return elasticEngine.performQuery(queriesService.boolQuery(filters));
+
+        return elasticEngine.performQuery(queriesService.boolQuery(filters), maxNHits.orElse(100));
     }
 
     /**
