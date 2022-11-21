@@ -1,5 +1,6 @@
 package co.empathy.academy.search.services;
 
+import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 
 import java.util.List;
@@ -77,4 +78,13 @@ public interface QueriesService {
      * @return Query to be executed
      */
     Query rangeIntegerQuery(String field, Integer min, Integer max);
+
+    /**
+     * Creates the sort options for the query
+     *
+     * @param field Field to sort
+     * @param order Ascending or descending
+     * @return Sort option
+     */
+    SortOptions sort(String field, String order);
 }

@@ -65,7 +65,7 @@ class SearchServiceImplTest {
         String query = "query";
         String fields = "field1,field2";
 
-        given(elasticEngine.performQuery(any(), any())).willReturn(new ArrayList<Movie>() {{
+        given(elasticEngine.performQuery(any(), any(), any())).willReturn(new ArrayList<Movie>() {{
             add(movie);
         }});
 
@@ -75,14 +75,14 @@ class SearchServiceImplTest {
         assertEquals(movie, movies.get(0));
 
         verify(queriesService, times(1)).multiMatch(query, fields.split(","));
-        verify(elasticEngine, times(1)).performQuery(any(), any());
+        verify(elasticEngine, times(1)).performQuery(any(), any(), any());
     }
 
     @Test
     void givenQueryAndField_whenTermQuery_thenMoviesReturned() throws IOException {
         String query = "query";
         String field = "field1";
-        given(elasticEngine.performQuery(any(), any())).willReturn(new ArrayList<Movie>() {{
+        given(elasticEngine.performQuery(any(), any(), any())).willReturn(new ArrayList<Movie>() {{
             add(movie);
         }});
 
@@ -92,14 +92,14 @@ class SearchServiceImplTest {
         assertEquals(movie, movies.get(0));
 
         verify(queriesService, times(1)).termQuery(query, field);
-        verify(elasticEngine, times(1)).performQuery(any(), any());
+        verify(elasticEngine, times(1)).performQuery(any(), any(), any());
     }
 
     @Test
     void givenQueriesAndFields_whenTermsQuery_thenMoviesReturned() throws IOException {
         String queries = "query1,query2";
         String field = "field1";
-        given(elasticEngine.performQuery(any(), any())).willReturn(new ArrayList<Movie>() {{
+        given(elasticEngine.performQuery(any(), any(), any())).willReturn(new ArrayList<Movie>() {{
             add(movie);
         }});
 
@@ -109,18 +109,19 @@ class SearchServiceImplTest {
         assertEquals(movie, movies.get(0));
 
         verify(queriesService, times(1)).termsQuery(queries.split(","), field);
-        verify(elasticEngine, times(1)).performQuery(any(), any());
+        verify(elasticEngine, times(1)).performQuery(any(), any(), any());
     }
 
     @Test
     void givenAllFilters_whenAllFiltersSearch_thenMoviesReturned() throws IOException {
-        given(elasticEngine.performQuery(any(), any())).willReturn(new ArrayList<Movie>() {{
+        given(elasticEngine.performQuery(any(), any(), any())).willReturn(new ArrayList<Movie>() {{
             add(movie);
         }});
 
         List<Movie> movies = searchService.allFiltersSearch(Optional.of("genre1,genre2"),
                 Optional.of("type1,type2"), Optional.of(2017), Optional.of(2016),
-                Optional.of(90), Optional.of(0), Optional.of(10.0), Optional.of(5.0), Optional.of(10));
+                Optional.of(90), Optional.of(0), Optional.of(10.0), Optional.of(5.0),
+                Optional.of(10), Optional.of("asc"));
 
         assertEquals(1, movies.size());
         assertEquals(movie, movies.get(0));
@@ -130,6 +131,6 @@ class SearchServiceImplTest {
         verify(queriesService, times(1)).rangeDoubleQuery(any(), any(), any());
         verify(queriesService, times(2)).shouldQuery(any());
         verify(queriesService, times(1)).boolQuery(any());
-        verify(elasticEngine, times(1)).performQuery(any(), any());
+        verify(elasticEngine, times(1)).performQuery(any(), any(), any());
     }
 }

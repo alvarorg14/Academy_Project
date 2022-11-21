@@ -120,6 +120,7 @@ public class QueriesController {
      * @param maxScore   Maximum average rating
      * @param minScore   Minimum average rating
      * @param maxNHits   Maximum number of hits
+     * @param sortRating Sort by rating
      * @return List of movies that match the filters
      */
     @Operation(summary = "Get movies by a basic filters query")
@@ -136,10 +137,11 @@ public class QueriesController {
                                                            @RequestParam("minMinutes") Optional<Integer> minMinutes,
                                                            @RequestParam("maxScore") Optional<Double> maxScore,
                                                            @RequestParam("minScore") Optional<Double> minScore,
-                                                           @RequestParam("maxNHits") Optional<Integer> maxNHits) {
+                                                           @RequestParam("maxNHits") Optional<Integer> maxNHits,
+                                                           @RequestParam("sortRating") Optional<String> sortRating) {
         try {
             List<Movie> movies = searchService.allFiltersSearch(genres, type, maxYear, minYear,
-                    maxMinutes, minMinutes, maxScore, minScore, maxNHits);
+                    maxMinutes, minMinutes, maxScore, minScore, maxNHits, sortRating);
             return ResponseEntity.ok(new SearchResponse(movies, new ArrayList<>()));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();

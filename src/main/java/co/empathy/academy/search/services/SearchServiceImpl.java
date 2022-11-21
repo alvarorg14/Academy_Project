@@ -1,5 +1,6 @@
 package co.empathy.academy.search.services;
 
+import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
@@ -63,7 +64,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Movie> multiMatch(String query, String fields) throws IOException {
         String[] fieldsArray = fields.split(",");
-        return elasticEngine.performQuery(queriesService.multiMatch(query, fieldsArray), 100);
+        return elasticEngine.performQuery(queriesService.multiMatch(query, fieldsArray), 100, new ArrayList<>());
     }
 
     /**
@@ -75,7 +76,7 @@ public class SearchServiceImpl implements SearchService {
      */
     @Override
     public List<Movie> termQuery(String value, String field) throws IOException {
-        return elasticEngine.performQuery(queriesService.termQuery(value, field), 100);
+        return elasticEngine.performQuery(queriesService.termQuery(value, field), 100, new ArrayList<>());
     }
 
     /**
@@ -88,7 +89,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Movie> termsQuery(String values, String field) throws IOException {
         String[] valuesArray = values.split(",");
-        return elasticEngine.performQuery(queriesService.termsQuery(valuesArray, field), 100);
+        return elasticEngine.performQuery(queriesService.termsQuery(valuesArray, field), 100, new ArrayList<>());
     }
 
     /**
@@ -103,6 +104,7 @@ public class SearchServiceImpl implements SearchService {
      * @param maxScore   Maximum average rating
      * @param minScore   Minimum average rating
      * @param maxNHits   Maximum number of hits
+     * @param sortRating Sort by rating
      * @return List of movies that match the filters
      * @throws IOException
      */
@@ -111,7 +113,7 @@ public class SearchServiceImpl implements SearchService {
                                         Optional<Integer> maxYear, Optional<Integer> minYear,
                                         Optional<Integer> maxRuntime, Optional<Integer> minRuntime,
                                         Optional<Double> maxScore, Optional<Double> minScore,
-                                        Optional<Integer> maxNHits) throws IOException {
+                                        Optional<Integer> maxNHits, Optional<String> sortRating) throws IOException {
 
         List<Query> filters = new ArrayList<>();
 
@@ -142,8 +144,11 @@ public class SearchServiceImpl implements SearchService {
                     maxScore.isPresent() ? maxScore.get() : Double.MAX_VALUE));
         }
 
-
-        return elasticEngine.performQuery(queriesService.boolQuery(filters), maxNHits.orElse(100));
+        List<SortOptions> sortOptions = new ArrayList<>() {{
+            add(queriesService.sort("averageRating", sortRating.orElse("desc")));
+            add(queriesService.sort("numVotes", sortRating.orElse("desc")));
+        }};
+        return elasticEngine.performQuery(queriesService.boolQuery(filters), maxNHits.orElse(100), sortOptions);
     }
 
     /**

@@ -54,6 +54,7 @@ public interface SearchService {
      * @param maxScore   Maximum average rating
      * @param minScore   Minimum average rating
      * @param maxNHits   Maximum number of hits
+     * @param sortRating Sort by rating
      * @return List of movies that match the filters
      * @throws IOException
      */
@@ -61,7 +62,7 @@ public interface SearchService {
                                  Optional<Integer> maxYear, Optional<Integer> minYear,
                                  Optional<Integer> maxRuntime, Optional<Integer> minRuntime,
                                  Optional<Double> maxScore, Optional<Double> minScore,
-                                 Optional<Integer> maxNHits) throws IOException;
+                                 Optional<Integer> maxNHits, Optional<String> sortRating) throws IOException;
 
     /**
      * Performs a search to get the genres aggregation

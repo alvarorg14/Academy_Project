@@ -1,5 +1,6 @@
 package co.empathy.academy.search.repositories;
 
+import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
@@ -44,11 +45,12 @@ public interface ElasticEngine {
     /**
      * Makes a query to elasticsearch
      *
-     * @param query    Query to make
-     * @param maxNHits Maximum number of hits to return
+     * @param query       Query to make
+     * @param maxNHits    Maximum number of hits to return
+     * @param sortOptions Sort options
      * @return List of movies that match the query
      */
-    List<Movie> performQuery(Query query, Integer maxNHits) throws IOException;
+    List<Movie> performQuery(Query query, Integer maxNHits, List<SortOptions> sortOptions) throws IOException;
 
     /**
      * Indexes a list of movies

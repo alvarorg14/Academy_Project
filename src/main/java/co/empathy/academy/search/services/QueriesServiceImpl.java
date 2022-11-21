@@ -1,6 +1,9 @@
 package co.empathy.academy.search.services;
 
+import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.json.JsonData;
 
@@ -131,5 +134,21 @@ public class QueriesServiceImpl implements QueriesService {
                 .field(field)
                 .gte(JsonData.of(min))
                 .lte(JsonData.of(max)))._toQuery();
+    }
+
+    /**
+     * Creates the sort options for the query
+     *
+     * @param field Field to sort
+     * @param order Ascending or descending
+     * @return Sort option
+     */
+    @Override
+    public SortOptions sort(String field, String order) {
+        SortOptions sortOptions = SortOptions.of(s -> s
+                .field(FieldSort.of(f -> f
+                        .field(field)
+                        .order(order.equals("asc") ? SortOrder.Asc : SortOrder.Desc))));
+        return sortOptions;
     }
 }
