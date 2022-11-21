@@ -31,6 +31,9 @@ class IndexControllerTest {
 
     private final MultipartFile crewFile = new MockMultipartFile("crew", "crew.txt",
             "text/plain", "crew".getBytes());
+
+    private final MultipartFile principalsFile = new MockMultipartFile("principals", "principals.txt",
+            "text/plain", "principals".getBytes());
     private final int EXPECTED_SUCCESS_CODE = 200;
     private final int EXPECTED_BAD_REQUEST_CODE = 400;
     private final int EXPECTED_ERROR_CODE = 500;
@@ -78,28 +81,28 @@ class IndexControllerTest {
 
     @Test
     void givenFile_whenIndexImdbData_thenDataIndexed() throws BulkIndexException, IOException {
-        doNothing().when(service).indexImdbData(basicsFile, ratingsFile, akasFile, crewFile);
+        doNothing().when(service).indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile);
 
         IndexController controller = new IndexController(service);
-        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile);
+        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile);
         assertEquals(202, response.getStatusCodeValue());
     }
 
     @Test
     void givenFile_whenIndexImdbData_thenBulkIndexException() throws BulkIndexException, IOException {
-        doThrow(BulkIndexException.class).when(service).indexImdbData(basicsFile, ratingsFile, akasFile, crewFile);
+        doThrow(BulkIndexException.class).when(service).indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile);
 
         IndexController controller = new IndexController(service);
-        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile);
+        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile);
         assertEquals(EXPECTED_BAD_REQUEST_CODE, response.getStatusCodeValue());
     }
 
     @Test
     void givenFile_whenIndexImdbData_thenIOException() throws BulkIndexException, IOException {
-        doThrow(IOException.class).when(service).indexImdbData(basicsFile, ratingsFile, akasFile, crewFile);
+        doThrow(IOException.class).when(service).indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile);
 
         IndexController controller = new IndexController(service);
-        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile);
+        ResponseEntity<String> response = controller.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile);
         assertEquals(EXPECTED_ERROR_CODE, response.getStatusCodeValue());
     }
 

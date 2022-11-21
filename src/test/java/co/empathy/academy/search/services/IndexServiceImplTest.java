@@ -31,6 +31,8 @@ class IndexServiceImplTest {
 
     private final MultipartFile crewFile = new MockMultipartFile("crew", "crew.txt",
             "text/plain", "crew".getBytes());
+    private final MultipartFile principalsFile = new MockMultipartFile("principals", "principals.txt",
+            "text/plain", "principals".getBytes());
     private final ElasticEngine engine = mock(ElasticEngine.class);
     private final IMDbReader reader = mock(IMDbReader.class);
 
@@ -41,7 +43,7 @@ class IndexServiceImplTest {
 
         IndexServiceImpl service = new IndexServiceImpl(engine);
 
-        assertDoesNotThrow(() -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile));
+        assertDoesNotThrow(() -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile));
 
     }
 
@@ -55,7 +57,7 @@ class IndexServiceImplTest {
         IndexServiceImpl service = new IndexServiceImpl(engine);
 
         Exception exception = assertThrows(BulkIndexException.class,
-                () -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile));
+                () -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile));
     }
 
     @Test
@@ -68,7 +70,7 @@ class IndexServiceImplTest {
         IndexServiceImpl service = new IndexServiceImpl(engine);
 
         Exception exception = assertThrows(IOException.class,
-                () -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile));
+                () -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile));
     }
 
 

@@ -3,6 +3,8 @@ package co.empathy.academy.search.util;
 import co.empathy.academy.search.models.Aka;
 import co.empathy.academy.search.models.Director;
 import co.empathy.academy.search.models.Movie;
+import co.empathy.academy.search.models.Principal;
+import co.empathy.academy.search.models.principals.Name;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -17,17 +19,20 @@ public class IMDbReader {
     private final BufferedReader ratingsReader;
     private final BufferedReader akasReader;
     private final BufferedReader crewReader;
+    private final BufferedReader principalsReader;
     private final int documentsSize = 20000;
 
     private boolean hasDocuments = true;
 
 
-    public IMDbReader(MultipartFile basicsFile, MultipartFile ratingsFile, MultipartFile akasFile, MultipartFile crewFile) {
+    public IMDbReader(MultipartFile basicsFile, MultipartFile ratingsFile, MultipartFile akasFile, MultipartFile crewFile,
+                      MultipartFile principalsFile) {
         try {
             this.basicsReader = new BufferedReader(new InputStreamReader(basicsFile.getInputStream()));
             this.ratingsReader = new BufferedReader(new InputStreamReader(ratingsFile.getInputStream()));
             this.akasReader = new BufferedReader(new InputStreamReader(akasFile.getInputStream()));
             this.crewReader = new BufferedReader(new InputStreamReader(crewFile.getInputStream()));
+            this.principalsReader = new BufferedReader(new InputStreamReader(principalsFile.getInputStream()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -41,6 +46,7 @@ public class IMDbReader {
             ratingsReader.readLine();
             akasReader.readLine();
             crewReader.readLine();
+            principalsReader.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -96,10 +102,12 @@ public class IMDbReader {
 
                 List<Director> directors = readDirectors();
 
+                List<Principal> principals = readPrincipals(basics[0], nextBasicsId);
+
                 Movie movie = new Movie(basics[0], basics[1], basics[2], basics[3], basics[4].contentEquals("1"),
                         StringIntegerConversion.toInt(basics[5]), StringIntegerConversion.toInt(basics[6]),
                         StringIntegerConversion.toInt(basics[7]), StringArrayConversion.toArray(basics[8]),
-                        averageRating, numVotes, akas, directors);
+                        averageRating, numVotes, akas, directors, principals);
 
                 result.add(movie);
 
@@ -110,6 +118,38 @@ public class IMDbReader {
         }
 
         return result;
+    }
+
+    private List<Principal> readPrincipals(String basicsId, String nextBasicsId) {
+        List<Principal> principals = new ArrayList<>();
+        boolean currentTconst = true;
+        try {
+            principalsReader.mark(100000);
+            while (currentTconst) {
+                String principalsLine = principalsReader.readLine();
+                if (principalsLine == null) {
+                    currentTconst = false;
+                } else {
+                    String[] fields = principalsLine.split("\t");
+                    if (!fields[0].contentEquals(basicsId)) {
+                        if (checkBasicIdHigher(basicsId, fields[0])) {
+                            readUntilNextIdNotExists(basicsId, principalsReader);
+                        } else if (!checkEqualIds(basicsId, fields[0])) {
+                            currentTconst = false;
+                        }
+                    } else {
+                        principals.add(new Principal(new Name(fields[2]), fields[5]));
+                    }
+                }
+            }
+            principalsReader.reset();
+            if (nextBasicsId != null && !checkEqualIds(basicsId, nextBasicsId)) {
+                readUntilNextId(basicsId, principalsReader);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return principals;
     }
 
     private List<Director> readDirectors() {
@@ -141,7 +181,7 @@ public class IMDbReader {
                     String[] fields = akasLine.split("\t");
                     if (!fields[0].contentEquals(basicsId)) {
                         if (checkBasicIdHigher(basicsId, fields[0])) {
-                            readUntilNextIdNotExists(basicsId);
+                            readUntilNextIdNotExists(basicsId, akasReader);
                         } else if (!checkEqualIds(basicsId, fields[0])) {
                             currentTconst = false;
                         }
@@ -152,7 +192,7 @@ public class IMDbReader {
             }
             akasReader.reset();
             if (nextBasicsId != null && !checkEqualIds(basicsId, nextBasicsId)) {
-                readUntilNextId(basicsId);
+                readUntilNextId(basicsId, akasReader);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -160,13 +200,13 @@ public class IMDbReader {
         return akas;
     }
 
-    private void readUntilNextIdNotExists(String basicsId) {
+    private void readUntilNextIdNotExists(String basicsId, BufferedReader reader) {
         boolean differentTConst = true;
         try {
             while (differentTConst) {
-                akasReader.mark(100000);
-                String akasLine = akasReader.readLine();
-                String[] fields = akasLine.split("\t");
+                reader.mark(100000);
+                String line = reader.readLine();
+                String[] fields = line.split("\t");
                 if (!checkBasicIdHigher(basicsId, fields[0])) {
                     differentTConst = false;
                 }
@@ -176,28 +216,28 @@ public class IMDbReader {
         }
     }
 
-    private void readUntilNextId(String basicsId) {
+    private void readUntilNextId(String basicsId, BufferedReader reader) {
         boolean differentTConst = true;
         try {
             while (differentTConst) {
-                akasReader.mark(1000);
-                String akasLine = akasReader.readLine();
-                String[] fields = akasLine.split("\t");
+                reader.mark(1000);
+                String line = reader.readLine();
+                String[] fields = line.split("\t");
                 if (!checkBasicIdHigher(basicsId, fields[0])) {
                     differentTConst = false;
                 }
             }
-            akasReader.reset();
+            reader.reset();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private boolean checkBasicIdHigher(String basicsTconst, String akasTconst) {
-        int tconstId = StringIntegerConversion.toInt(basicsTconst.substring(2, 9));
-        int akasId = StringIntegerConversion.toInt(akasTconst.substring(2, 9));
+    private boolean checkBasicIdHigher(String tconst1, String tconst2) {
+        int id1 = StringIntegerConversion.toInt(tconst1.substring(2, 9));
+        int id2 = StringIntegerConversion.toInt(tconst2.substring(2, 9));
 
-        return tconstId > akasId;
+        return id1 > id2;
     }
 
     private boolean checkEqualIds(String tconst1, String tconst2) {
