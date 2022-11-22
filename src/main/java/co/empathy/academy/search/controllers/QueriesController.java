@@ -112,13 +112,15 @@ public class QueriesController {
      * GET /search - Performs a search with all the filters
      *
      * @param genres     Genres to search
-     * @param types      Types to search
+     * @param type       Types to search
      * @param maxYear    Maximum year to search
      * @param minYear    Minimum year to search
      * @param maxMinutes Maximum runtime minutes
      * @param minMinutes Minimum runtime minutes
      * @param maxScore   Maximum average rating
      * @param minScore   Minimum average rating
+     * @param maxNHits   Maximum number of hits
+     * @param sortRating Sort by rating
      * @return List of movies that match the filters
      */
     @Operation(summary = "Get movies by a basic filters query")
@@ -128,16 +130,18 @@ public class QueriesController {
             @ApiResponse(responseCode = "500", description = "Error searching the movies")
     })
     public ResponseEntity<SearchResponse> allFiltersSearch(@RequestParam("genres") Optional<String> genres,
-                                                           @RequestParam("types") Optional<String> types,
+                                                           @RequestParam("type") Optional<String> type,
                                                            @RequestParam("maxYear") Optional<Integer> maxYear,
                                                            @RequestParam("minYear") Optional<Integer> minYear,
                                                            @RequestParam("maxMinutes") Optional<Integer> maxMinutes,
                                                            @RequestParam("minMinutes") Optional<Integer> minMinutes,
                                                            @RequestParam("maxScore") Optional<Double> maxScore,
-                                                           @RequestParam("minScore") Optional<Double> minScore) {
+                                                           @RequestParam("minScore") Optional<Double> minScore,
+                                                           @RequestParam("maxNHits") Optional<Integer> maxNHits,
+                                                           @RequestParam("sortRating") Optional<String> sortRating) {
         try {
-            List<Movie> movies = searchService.allFiltersSearch(genres, types, maxYear, minYear,
-                    maxMinutes, minMinutes, maxScore, minScore);
+            List<Movie> movies = searchService.allFiltersSearch(genres, type, maxYear, minYear,
+                    maxMinutes, minMinutes, maxScore, minScore, maxNHits, sortRating);
             return ResponseEntity.ok(new SearchResponse(movies, new ArrayList<>()));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();

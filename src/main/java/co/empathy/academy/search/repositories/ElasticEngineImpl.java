@@ -1,6 +1,7 @@
 package co.empathy.academy.search.repositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
@@ -35,15 +36,18 @@ public class ElasticEngineImpl implements ElasticEngine {
     /**
      * Performs a query to elasticsearch
      *
-     * @param query Query to make
+     * @param query       Query to make
+     * @param maxNHits    Maximum number of hits to return
+     * @param sortOptions Sort options
      * @return List of movies that match the query
      */
     @Override
-    public List<Movie> performQuery(Query query) throws IOException {
+    public List<Movie> performQuery(Query query, Integer maxNHits, List<SortOptions> sortOptions) throws IOException {
         SearchResponse<Movie> response = client.search(s -> s
                 .index(INDEX_NAME)
                 .query(query)
-                .size(1000), Movie.class);
+                .sort(sortOptions)
+                .size(maxNHits), Movie.class);
 
         return response.hits().hits().stream()
                 .map(Hit::source)
