@@ -4,6 +4,7 @@ import co.empathy.academy.search.util.ResourcesUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class MovieTest {
 
@@ -27,6 +28,26 @@ class MovieTest {
         assertEquals(ResourcesUtil.getAkas(), movie.getAkas());
         assertEquals(ResourcesUtil.getDirectors(), movie.getDirectors());
         assertEquals(ResourcesUtil.getPrincipals(), movie.getStarring());
+    }
+
+    @Test
+    void givenNoAttributes_whenCreateMovie_thenMovieCreated() {
+        Movie movie = new Movie();
+
+        assertNull(movie.getTconst());
+        assertNull(movie.getTitleType());
+        assertNull(movie.getPrimaryTitle());
+        assertNull(movie.getOriginalTitle());
+        assertNull(movie.getIsAdult());
+        assertEquals(0, movie.getStartYear());
+        assertEquals(0, movie.getEndYear());
+        assertEquals(0, movie.getRuntimeMinutes());
+        assertNull(movie.getGenres());
+        assertEquals(0.0, movie.getAverageRating());
+        assertEquals(0, movie.getNumVotes());
+        assertNull(movie.getAkas());
+        assertNull(movie.getDirectors());
+        assertNull(movie.getStarring());
     }
 
 }

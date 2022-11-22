@@ -3,6 +3,7 @@ package co.empathy.academy.search.repositories;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.util.ResourcesUtil;
@@ -51,6 +52,12 @@ class ElasticEngineImplTest {
     void givenMovies_whenBulkIndex_thenIOException() throws IOException {
         given(client.bulk((any(BulkRequest.class)))).willThrow(IOException.class);
         assertThrows(IOException.class, () -> new ElasticEngineImpl(client).indexBulk(movies));
+    }
+
+    @Test
+    void givenMovie_whenIndexDocument_thenMovieIndexed() throws IOException {
+        given(client.index(any(IndexRequest.class))).willReturn(null);
+        assertDoesNotThrow(() -> new ElasticEngineImpl(client).indexDocument(movies.get(0)));
     }
 
 }
