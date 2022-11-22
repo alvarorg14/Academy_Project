@@ -50,6 +50,8 @@ public class IndexServiceImpl implements IndexService {
      * @param crewFile       File with the imdb crew data
      * @param principalsFile File with the imdb principals data
      * @return True if the data was indexed correctly, false otherwise
+     * @throws IOException        - if the data cannot be indexed
+     * @throws BulkIndexException - if there was an error in the bulk petition
      */
     @Override
     public void indexImdbData(MultipartFile basicsFile, MultipartFile ratingsFile,

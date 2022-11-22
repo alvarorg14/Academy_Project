@@ -29,12 +29,6 @@ public class SearchServiceImpl implements SearchService {
         this.queriesService = queriesService;
     }
 
-    /*
-    @Override
-    public void makeAggsQuery() throws IOException {
-        elasticEngine.makeAggsQuery();
-    }*/
-
     /**
      * Makes a request to obtain the cluster name and returns it and the query performed.
      *
@@ -106,7 +100,7 @@ public class SearchServiceImpl implements SearchService {
      * @param maxNHits   Maximum number of hits
      * @param sortRating Sort by rating
      * @return List of movies that match the filters
-     * @throws IOException
+     * @throws IOException If the query fails
      */
     @Override
     public List<Movie> allFiltersSearch(Optional<String> genres, Optional<String> types,
@@ -155,7 +149,7 @@ public class SearchServiceImpl implements SearchService {
      * Performs a search to get the genres aggregation
      *
      * @return Facet with the genres aggregation
-     * @throws IOException
+     * @throws IOException if the request fails
      */
     @Override
     public Facet getGenresAggregation() throws IOException {
