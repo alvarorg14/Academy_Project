@@ -79,12 +79,13 @@ public class IndexController {
             @ApiResponse(responseCode = "400", description = "Error indexing the data"),
             @ApiResponse(responseCode = "500", description = "Internal server error"),
     })
-    public ResponseEntity indexImdbData(@RequestParam("basicsFile") MultipartFile basicsFile,
-                                        @RequestParam("ratingsFile") MultipartFile ratingsFile,
-                                        @RequestParam("akasFile") MultipartFile akasFile,
-                                        @RequestParam("crewFile") MultipartFile crewFile) {
+    public ResponseEntity indexImdbData(@RequestParam("basics") MultipartFile basicsFile,
+                                        @RequestParam("ratings") MultipartFile ratingsFile,
+                                        @RequestParam("akas") MultipartFile akasFile,
+                                        @RequestParam("crew") MultipartFile crewFile,
+                                        @RequestParam("principals") MultipartFile principalsFile) {
         try {
-            indexService.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile);
+            indexService.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile);
         } catch (BulkIndexException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {

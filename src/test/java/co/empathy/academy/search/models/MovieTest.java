@@ -11,7 +11,7 @@ class MovieTest {
     void givenCorrectAttributes_whenCreateMovie_thenMovieCreated() {
         Movie movie = new Movie("tconst", "titleType", "primaryTitle",
                 "originalTitle", true, 1, 1, 1, new String[]{"genre"},
-                1.0, 1, ResourcesUtil.getAkas(), ResourcesUtil.getDirectors());
+                1.0, 1, ResourcesUtil.getAkas(), ResourcesUtil.getDirectors(), ResourcesUtil.getPrincipals());
 
         assertEquals("tconst", movie.getTconst());
         assertEquals("titleType", movie.getTitleType());
@@ -26,6 +26,7 @@ class MovieTest {
         assertEquals(1, movie.getNumVotes());
         assertEquals(ResourcesUtil.getAkas(), movie.getAkas());
         assertEquals(ResourcesUtil.getDirectors(), movie.getDirectors());
+        assertEquals(ResourcesUtil.getPrincipals(), movie.getStarring());
     }
 
 }

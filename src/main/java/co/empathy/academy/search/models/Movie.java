@@ -24,4 +24,5 @@ public class Movie {
     int numVotes;
     List<Aka> akas;
     List<Director> directors;
+    List<Principal> starring;
 }
