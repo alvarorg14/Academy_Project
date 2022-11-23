@@ -206,9 +206,13 @@ public class IMDbReader {
             while (differentTConst) {
                 reader.mark(100000);
                 String line = reader.readLine();
-                String[] fields = line.split("\t");
-                if (!checkBasicIdHigher(basicsId, fields[0])) {
+                if (line == null) {
                     differentTConst = false;
+                } else {
+                    String[] fields = line.split("\t");
+                    if (!checkBasicIdHigher(basicsId, fields[0])) {
+                        differentTConst = false;
+                    }
                 }
             }
         } catch (IOException e) {
@@ -222,9 +226,13 @@ public class IMDbReader {
             while (differentTConst) {
                 reader.mark(1000);
                 String line = reader.readLine();
-                String[] fields = line.split("\t");
-                if (!checkBasicIdHigher(basicsId, fields[0])) {
+                if (line == null) {
                     differentTConst = false;
+                } else {
+                    String[] fields = line.split("\t");
+                    if (!checkBasicIdHigher(basicsId, fields[0])) {
+                        differentTConst = false;
+                    }
                 }
             }
             reader.reset();
