@@ -16,8 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 class IndexServiceImplTest {
 
@@ -71,6 +70,71 @@ class IndexServiceImplTest {
 
         Exception exception = assertThrows(IOException.class,
                 () -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile));
+    }
+
+    @Test
+    void givenElasticUp_whenCreateIndex_thenIndexCreated() throws IOException {
+        IndexServiceImpl service = new IndexServiceImpl(engine);
+        assertDoesNotThrow(() -> service.createIndex());
+
+        verify(engine, times(1)).createIndex();
+        verify(engine, times(1)).putSettings();
+        verify(engine, times(1)).putMapping();
+    }
+
+    @Test
+    void givenElasticDown_whenCreateIndex_thenErrorCreating() throws IOException {
+        doThrow(IOException.class).when(engine).createIndex();
+
+        IndexServiceImpl service = new IndexServiceImpl(engine);
+        assertThrows(IOException.class, () -> service.createIndex());
+
+        verify(engine, times(1)).createIndex();
+        verify(engine, times(0)).putSettings();
+        verify(engine, times(0)).putMapping();
+    }
+
+    @Test
+    void givenElasticDown_whenCreateIndex_thenErrorSetting() throws IOException {
+        doThrow(IOException.class).when(engine).putSettings();
+
+        IndexServiceImpl service = new IndexServiceImpl(engine);
+        assertThrows(IOException.class, () -> service.createIndex());
+
+        verify(engine, times(1)).createIndex();
+        verify(engine, times(1)).putSettings();
+        verify(engine, times(0)).putMapping();
+    }
+
+    @Test
+    void givenElasticDown_whenCreateIndex_thenErrorMapping() throws IOException {
+        doThrow(IOException.class).when(engine).putMapping();
+
+        IndexServiceImpl service = new IndexServiceImpl(engine);
+        assertThrows(IOException.class, () -> service.createIndex());
+
+        verify(engine, times(1)).createIndex();
+        verify(engine, times(1)).putSettings();
+        verify(engine, times(1)).putMapping();
+    }
+
+    @Test
+    void givenElasticUpAndMovie_whenIndexDocument_thenDocumentIndexed() throws IOException {
+        doNothing().when(engine).indexDocument(any());
+
+        IndexServiceImpl service = new IndexServiceImpl(engine);
+        assertDoesNotThrow(() -> service.indexDocument(movies.get(0)));
+
+        verify(engine, times(1)).indexDocument(any());
+    }
+
+    @Test
+    void givenElasticDownAndMovie_whenIndexDocument_thenErrorIndexing() throws IOException {
+        doThrow(IOException.class).when(engine).indexDocument(any());
+        IndexServiceImpl service = new IndexServiceImpl(engine);
+        assertThrows(IOException.class, () -> service.indexDocument(movies.get(0)));
+
+        verify(engine, times(1)).indexDocument(any());
     }
 
 

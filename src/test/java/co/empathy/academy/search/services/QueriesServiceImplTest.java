@@ -1,5 +1,7 @@
 package co.empathy.academy.search.services;
 
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import org.junit.jupiter.api.Test;
 
@@ -81,6 +83,22 @@ class QueriesServiceImplTest {
         assertEquals(2, result.size());
         assertTrue(result.get(0).isTerm());
         assertTrue(result.get(1).isTerm());
+    }
+
+    @Test
+    void givenFieldAndAscOrder_whenSort_thenSortOptionFormed() {
+        SortOptions result = queriesService.sort(field, "asc");
+        assertNotNull(result);
+        assertTrue(result.isField());
+        assertEquals(SortOrder.Asc, result.field().order());
+    }
+
+    @Test
+    void givenFieldAndDescOrder_whenSort_thenSortOptionFormed() {
+        SortOptions result = queriesService.sort(field, "desc");
+        assertNotNull(result);
+        assertTrue(result.isField());
+        assertEquals(SortOrder.Desc, result.field().order());
     }
 
 

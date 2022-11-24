@@ -2,6 +2,8 @@ package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
+import co.empathy.academy.search.models.facets.Facet;
+import co.empathy.academy.search.models.facets.FacetValue;
 import co.empathy.academy.search.repositories.ElasticEngine;
 import co.empathy.academy.search.repositories.ElasticLowClient;
 import co.empathy.academy.search.util.ResourcesUtil;
@@ -52,6 +54,19 @@ class SearchServiceImplTest {
 
         ElasticLowClient elasticLowClient = mock(ElasticLowClient.class);
         given(elasticLowClient.getElasticInfo()).willThrow(new RuntimeException());
+
+        ElasticEngine elasticEngine = mock(ElasticEngine.class);
+        SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService);
+
+        assertThrows(RuntimeException.class, () -> searchService.search(query));
+    }
+
+    @Test
+    void givenQuery_whenSearch_thenParseException() {
+        String query = "query";
+
+        ElasticLowClient elasticLowClient = mock(ElasticLowClient.class);
+        given(elasticLowClient.getElasticInfo()).willReturn("{\"cluster_name\":}");
 
         ElasticEngine elasticEngine = mock(ElasticEngine.class);
         SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService);
@@ -133,5 +148,30 @@ class SearchServiceImplTest {
         verify(queriesService, times(1)).boolQuery(any());
         verify(queriesService, times(2)).sort(any(), any());
         verify(elasticEngine, times(1)).performQuery(any(), any(), any());
+    }
+
+    @Test
+    void givenElasticUp_whenGenresAggregation_thenFacetReturned() throws IOException {
+        Facet expectedFacet = new Facet("genres", "value",
+                List.of(new FacetValue("genre1", "genre1", 2L, "genre")));
+
+        given(elasticEngine.getGenresAggregation()).willReturn(expectedFacet);
+
+        Facet result = searchService.getGenresAggregation();
+
+        assertEquals(expectedFacet, result);
+        assertEquals(expectedFacet.getFacet(), result.getFacet());
+        assertEquals(expectedFacet.getValues().size(), result.getValues().size());
+
+        verify(elasticEngine, times(1)).getGenresAggregation();
+    }
+
+    @Test
+    void givenElasticDown_whenGenresAggregation_thenIOException() throws IOException {
+        given(elasticEngine.getGenresAggregation()).willThrow(IOException.class);
+
+        assertThrows(IOException.class, () -> searchService.getGenresAggregation());
+
+        verify(elasticEngine, times(1)).getGenresAggregation();
     }
 }
