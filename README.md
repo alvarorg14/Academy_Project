@@ -26,10 +26,11 @@ Finally, if you want to stop the containers:
 docker-compose down
 ```
 
-### Important!!
+## API Documentation
 
-If you want to start again the containers without losing the indexed data run:
+The API documentation is available in the following link:
 
 ```
-docker-compose up
+http://localhost:8080/swagger-ui/index.html
 ```
+
