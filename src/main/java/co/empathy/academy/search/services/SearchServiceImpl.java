@@ -142,7 +142,7 @@ public class SearchServiceImpl implements SearchService {
             add(queriesService.sort("averageRating", sortRating.orElse("desc")));
             add(queriesService.sort("numVotes", sortRating.orElse("desc")));
         }};
-        return elasticEngine.performQuery(queriesService.boolQuery(filters), maxNHits.orElse(100), sortOptions);
+        return elasticEngine.performQuery(queriesService.mustQuery(filters), maxNHits.orElse(100), sortOptions);
     }
 
     /**

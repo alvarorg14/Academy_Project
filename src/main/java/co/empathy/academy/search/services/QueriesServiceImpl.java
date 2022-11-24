@@ -81,14 +81,14 @@ public class QueriesServiceImpl implements QueriesService {
     }
 
     /**
-     * Creates a bool query
+     * Creates a must query
      *
      * @param queries List of queries to be executed
      * @return Query to be executed
      */
     @Override
-    public Query boolQuery(List<Query> queries) {
-        Query boolQuery = BoolQuery.of(b -> b.filter(queries))._toQuery();
+    public Query mustQuery(List<Query> queries) {
+        Query boolQuery = BoolQuery.of(b -> b.must(queries))._toQuery();
         return boolQuery;
     }
 

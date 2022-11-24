@@ -44,12 +44,12 @@ public interface QueriesService {
     Query termsQuery(String[] values, String field);
 
     /**
-     * Creates a bool query
+     * Creates a must query
      *
      * @param queries List of queries to be executed
      * @return Query to be executed
      */
-    Query boolQuery(List<Query> queries);
+    Query mustQuery(List<Query> queries);
 
     /**
      * Creates a should query

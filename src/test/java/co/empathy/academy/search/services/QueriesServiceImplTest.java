@@ -40,7 +40,7 @@ class QueriesServiceImplTest {
 
     @Test
     void givenQueries_whenBoolQuery_thenQueryFormed() {
-        Query result = queriesService.boolQuery(
+        Query result = queriesService.mustQuery(
                 new ArrayList<>() {{
                     add(queriesService.multiMatch(query, new String[]{field, "field2"}));
                     add(queriesService.termQuery(query, field));
