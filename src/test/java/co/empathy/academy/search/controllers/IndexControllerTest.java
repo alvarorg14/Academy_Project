@@ -106,4 +106,5 @@ class IndexControllerTest {
         assertEquals(EXPECTED_ERROR_CODE, response.getStatusCodeValue());
     }
 
+
 }

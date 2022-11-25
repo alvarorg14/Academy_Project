@@ -2,6 +2,9 @@ package co.empathy.academy.search.controllers;
 
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.QueryResponse;
+import co.empathy.academy.search.models.SearchResponse;
+import co.empathy.academy.search.models.facets.Facet;
+import co.empathy.academy.search.models.facets.FacetValue;
 import co.empathy.academy.search.services.SearchService;
 import co.empathy.academy.search.util.ResourcesUtil;
 import org.junit.jupiter.api.Test;
@@ -11,10 +14,12 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class QueriesControllerTest {
@@ -111,6 +116,67 @@ class QueriesControllerTest {
         QueriesController controller = new QueriesController(service);
 
         ResponseEntity<List<Movie>> response = controller.termsQuery(queries, field);
+
+        assertEquals(EXPECTED_ERROR_STATUS, response.getStatusCodeValue());
+    }
+
+    @Test
+    void givenAllFilters_whenAllFiltersSearch_thenResponseReturned() throws IOException {
+        given(service.allFiltersSearch(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).willReturn(movies);
+
+        QueriesController controller = new QueriesController(service);
+
+        ResponseEntity<SearchResponse> response = controller.allFiltersSearch(Optional.of("genres"),
+                Optional.of("type"), Optional.of(2017), Optional.of(2018), Optional.of(1),
+                Optional.of(10), Optional.of(5.0), Optional.of(10.0), Optional.of(100), Optional.of("asc"));
+
+        assertEquals(EXPECTED_SUCCESS_STATUS, response.getStatusCodeValue());
+        assertEquals(movies, response.getBody().getHits());
+        assertEquals(0, response.getBody().getFacets().size());
+
+        verify(service, times(1)).allFiltersSearch(
+                any(), any(), any(), any(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void givenAllFilters_whenAllFiltersSearch_thenIOException() throws IOException {
+        given(service.allFiltersSearch(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).willThrow(IOException.class);
+
+        QueriesController controller = new QueriesController(service);
+
+        ResponseEntity<SearchResponse> response = controller.allFiltersSearch(Optional.of("genres"),
+                Optional.of("type"), Optional.of(2017), Optional.of(2018), Optional.of(1),
+                Optional.of(10), Optional.of(5.0), Optional.of(10.0), Optional.of(100), Optional.of("asc"));
+
+        assertEquals(EXPECTED_ERROR_STATUS, response.getStatusCodeValue());
+    }
+
+    @Test
+    void givenAllUp_whenGenresSearch_thenFacetReturned() throws IOException {
+        Facet facet = new Facet("genres", "value",
+                List.of(new FacetValue("genre1", "genre1", 1L, "genre1")));
+
+        given(service.getGenresAggregation()).willReturn(facet);
+
+        QueriesController controller = new QueriesController(service);
+
+        ResponseEntity<SearchResponse> response = controller.genresSearch();
+
+        assertEquals(EXPECTED_SUCCESS_STATUS, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().getFacets().size());
+        assertEquals(facet, response.getBody().getFacets().get(0));
+        assertEquals(0, response.getBody().getHits().size());
+
+        verify(service, times(1)).getGenresAggregation();
+    }
+
+    @Test
+    void givenElasticDown_whenGenresSearch_thenInternalServerError() throws IOException {
+        given(service.getGenresAggregation()).willThrow(IOException.class);
+
+        QueriesController controller = new QueriesController(service);
+
+        ResponseEntity<SearchResponse> response = controller.genresSearch();
 
         assertEquals(EXPECTED_ERROR_STATUS, response.getStatusCodeValue());
     }

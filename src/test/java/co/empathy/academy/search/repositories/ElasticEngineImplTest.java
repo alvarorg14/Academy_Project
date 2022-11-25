@@ -3,7 +3,7 @@ package co.empathy.academy.search.repositories;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
+import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.util.ResourcesUtil;
@@ -56,7 +56,8 @@ class ElasticEngineImplTest {
 
     @Test
     void givenMovie_whenIndexDocument_thenMovieIndexed() throws IOException {
-        given(client.index(any(IndexRequest.class))).willReturn(null);
+        IndexResponse response = mock(IndexResponse.class);
+        given(client.index(i -> i.index("imdb").id(movies.get(0).getTconst()).document(movies.get(0)))).willReturn(response);
         assertDoesNotThrow(() -> new ElasticEngineImpl(client).indexDocument(movies.get(0)));
     }
 
