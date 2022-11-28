@@ -107,8 +107,8 @@ class QueriesServiceImplTest {
     }
 
     @Test
-    void givenFieldModifiesAndFactor_whenFunctionScore_thenFunctionScoreCreated() {
-        FunctionScore result = queriesService.functionScore(field, 1.0, "log1p");
+    void givenFieldModifierAndFactor_whenFunctionScore_thenFunctionScoreCreated() {
+        FunctionScore result = queriesService.functionScore(field, 1.0, "Log1p");
 
         assertNotNull(result);
         assertTrue(result.isFieldValueFactor());
@@ -116,6 +116,28 @@ class QueriesServiceImplTest {
         assertEquals(field, result.fieldValueFactor().field());
         assertEquals(FieldValueFactorModifier.Log1p, result.fieldValueFactor().modifier());
         assertEquals(1.0, result.fieldValueFactor().factor());
+    }
+
+    @Test
+    void givenFieldLnModifierAndDoubleFactor_whenFunctionScore_thenFunctionScoreCreated() {
+        FunctionScore result = queriesService.functionScore(field, 2D, "Ln1p");
+
+        assertNotNull(result);
+        assertTrue(result.isFieldValueFactor());
+
+        assertEquals(field, result.fieldValueFactor().field());
+        assertEquals(FieldValueFactorModifier.Ln1p, result.fieldValueFactor().modifier());
+        assertEquals(2.0, result.fieldValueFactor().factor());
+    }
+
+    @Test
+    void givenQuery_whenFunctionScoreQuery_thenFunctionScoreQueryCreated() {
+        Query query = queriesService.termQuery("query", "field");
+        Query result = queriesService.functionScoreQuery(query);
+
+        assertNotNull(result);
+        assertTrue(result.isFunctionScore());
+        assertEquals(2, result.functionScore().functions().size());
     }
 
 

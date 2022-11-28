@@ -159,8 +159,8 @@ public class QueriesServiceImpl implements QueriesService {
      */
     @Override
     public Query functionScoreQuery(Query query) {
-        FunctionScore numVotes = functionScore("numVotes", 2.0, "log1p");
-        FunctionScore averageRating = functionScore("averageRating", 2.0, "log1p");
+        FunctionScore numVotes = functionScore("numVotes", 2.0, "Log1p");
+        FunctionScore averageRating = functionScore("averageRating", 2.0, "Ln1p");
 
         Query functionScore = FunctionScoreQuery.of(f -> f
                 .query(query)
@@ -183,7 +183,7 @@ public class QueriesServiceImpl implements QueriesService {
         FunctionScore functionScore = FunctionScore.of(f -> f
                 .fieldValueFactor(fv -> fv
                         .field(field)
-                        .modifier(FieldValueFactorModifier.valueOf("log1p"))
+                        .modifier(FieldValueFactorModifier.valueOf(modifier))
                         .factor(factor)));
         return functionScore;
     }
