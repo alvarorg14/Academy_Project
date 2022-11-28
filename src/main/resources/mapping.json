@@ -36,33 +36,6 @@
     },
     "numVotes": {
       "type": "integer"
-    },
-    "akas": {
-      "type": "nested",
-      "properties": {
-        "title": {
-          "type": "text",
-          "analyzer": "custom_analyzer",
-          "search_analyzer": "custom_analyzer"
-        },
-        "region": {
-          "type": "keyword"
-        },
-        "language": {
-          "type": "keyword"
-        },
-        "isOriginalTitle": {
-          "type": "boolean"
-        }
-      }
-    },
-    "directors": {
-      "type": "nested",
-      "properties": {
-        "nconst": {
-          "type": "keyword"
-        }
-      }
     }
   }
 }
