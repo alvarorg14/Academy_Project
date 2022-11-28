@@ -15,6 +15,7 @@ services:
 
   searchapi:
     container_name: searchApi
+    hostname: "searchapi"
     build:
       context: .
       dockerfile: Dockerfile
