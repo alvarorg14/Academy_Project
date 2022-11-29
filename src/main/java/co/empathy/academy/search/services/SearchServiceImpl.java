@@ -139,10 +139,15 @@ public class SearchServiceImpl implements SearchService {
         }
 
         List<SortOptions> sortOptions = new ArrayList<>() {{
-            add(queriesService.sort("averageRating", sortRating.orElse("desc")));
-            add(queriesService.sort("numVotes", sortRating.orElse("desc")));
+            if (sortRating.isPresent()) {
+                add(queriesService.sort("averageRating", sortRating.orElse("desc")));
+                add(queriesService.sort("numVotes", sortRating.orElse("desc")));
+            }
         }};
-        return elasticEngine.performQuery(queriesService.mustQuery(filters), maxNHits.orElse(100), sortOptions);
+
+        Query query = queriesService.mustQuery(filters);
+
+        return elasticEngine.performQuery(queriesService.functionScoreQuery(query), maxNHits.orElse(100), sortOptions);
     }
 
     /**

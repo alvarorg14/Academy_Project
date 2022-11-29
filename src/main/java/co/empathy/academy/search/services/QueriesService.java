@@ -1,6 +1,7 @@
 package co.empathy.academy.search.services;
 
 import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScore;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 
 import java.util.List;
@@ -87,4 +88,20 @@ public interface QueriesService {
      * @return Sort option
      */
     SortOptions sort(String field, String order);
+
+    /**
+     * Creates a function score query
+     *
+     * @param query - Query to apply the score
+     */
+    Query functionScoreQuery(Query query);
+
+    /**
+     * Creates a function score field
+     *
+     * @param field    Field used for the score
+     * @param factor   Factor to multiply the score
+     * @param modifier Modifier to apply to the score
+     */
+    FunctionScore functionScore(String field, Double factor, String modifier);
 }

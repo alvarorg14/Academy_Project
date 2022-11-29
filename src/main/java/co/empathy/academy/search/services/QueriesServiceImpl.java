@@ -151,4 +151,40 @@ public class QueriesServiceImpl implements QueriesService {
                         .order(order.equals("asc") ? SortOrder.Asc : SortOrder.Desc))));
         return sortOptions;
     }
+
+    /**
+     * Creates a function score query
+     *
+     * @param query - Query to apply the score
+     */
+    @Override
+    public Query functionScoreQuery(Query query) {
+        FunctionScore numVotes = functionScore("numVotes", 2.0, "Log1p");
+        FunctionScore averageRating = functionScore("averageRating", 2.0, "Ln1p");
+
+        Query functionScore = FunctionScoreQuery.of(f -> f
+                .query(query)
+                .functions(numVotes, averageRating)
+                .scoreMode(FunctionScoreMode.Multiply)
+                .boostMode(FunctionBoostMode.Multiply))._toQuery();
+
+        return functionScore;
+    }
+
+    /**
+     * Creates a function score field
+     *
+     * @param field    Field used for the score
+     * @param factor   Factor to multiply the score
+     * @param modifier Modifier to apply to the score
+     */
+    @Override
+    public FunctionScore functionScore(String field, Double factor, String modifier) {
+        FunctionScore functionScore = FunctionScore.of(f -> f
+                .fieldValueFactor(fv -> fv
+                        .field(field)
+                        .modifier(FieldValueFactorModifier.valueOf(modifier))
+                        .factor(factor)));
+        return functionScore;
+    }
 }
