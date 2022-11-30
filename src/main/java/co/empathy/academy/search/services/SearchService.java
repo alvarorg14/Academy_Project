@@ -1,6 +1,7 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.models.Movie;
+import co.empathy.academy.search.models.Name;
 import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.models.facets.Facet;
 
@@ -71,4 +72,12 @@ public interface SearchService {
      * @throws IOException
      */
     Facet getGenresAggregation() throws IOException;
+
+    /**
+     * Performs a search to get the names information
+     *
+     * @param nconsts - nconsts to search
+     * @return List of names information
+     */
+    List<Name> namesSearch(String nconsts) throws IOException;
 }

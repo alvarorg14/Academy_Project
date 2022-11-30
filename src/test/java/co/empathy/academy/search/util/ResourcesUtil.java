@@ -4,7 +4,7 @@ import co.empathy.academy.search.models.Aka;
 import co.empathy.academy.search.models.Director;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.Principal;
-import co.empathy.academy.search.models.principals.Name;
+import co.empathy.academy.search.models.principals.PrincipalsName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class ResourcesUtil {
     }
 
     public static Principal getPrincipal(String sufix) {
-        return new Principal(new Name("testName" + sufix), "testCategory" + sufix);
+        return new Principal(new PrincipalsName("testName" + sufix), "testCategory" + sufix);
     }
 
     public static List<Principal> getPrincipals() {

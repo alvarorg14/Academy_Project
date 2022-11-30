@@ -2,8 +2,11 @@ package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
+import co.empathy.academy.search.models.Name;
 import co.empathy.academy.search.repositories.ElasticEngine;
+import co.empathy.academy.search.repositories.names.ElasticNamesEngine;
 import co.empathy.academy.search.util.IMDbReader;
+import co.empathy.academy.search.util.NamesReader;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -13,9 +16,11 @@ public class IndexServiceImpl implements IndexService {
 
 
     private final ElasticEngine elasticEngine;
+    private final ElasticNamesEngine elasticNamesEngine;
 
-    public IndexServiceImpl(ElasticEngine elasticEngine) {
+    public IndexServiceImpl(ElasticEngine elasticEngine, ElasticNamesEngine elasticNamesEngine) {
         this.elasticEngine = elasticEngine;
+        this.elasticNamesEngine = elasticNamesEngine;
     }
 
     /**
@@ -49,7 +54,6 @@ public class IndexServiceImpl implements IndexService {
      * @param akasFile       File with the imdb akas data
      * @param crewFile       File with the imdb crew data
      * @param principalsFile File with the imdb principals data
-     * @return True if the data was indexed correctly, false otherwise
      * @throws IOException        - if the data cannot be indexed
      * @throws BulkIndexException - if there was an error in the bulk petition
      */
@@ -64,4 +68,23 @@ public class IndexServiceImpl implements IndexService {
             elasticEngine.indexBulk(movies);
         }
     }
+
+    /**
+     * Indexes names data
+     *
+     * @param namesFile File with the names data
+     */
+    @Override
+    public void indexNamesData(MultipartFile namesFile) throws IOException, BulkIndexException {
+        elasticNamesEngine.createIndex();
+        elasticNamesEngine.putMapping();
+
+        NamesReader reader = new NamesReader(namesFile);
+
+        while (reader.hasDocuments()) {
+            List<Name> names = reader.readDocuments();
+            elasticNamesEngine.indexBulk(names);
+        }
+    }
+
 }

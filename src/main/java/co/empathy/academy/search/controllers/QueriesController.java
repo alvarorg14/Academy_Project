@@ -1,6 +1,7 @@
 package co.empathy.academy.search.controllers;
 
 import co.empathy.academy.search.models.Movie;
+import co.empathy.academy.search.models.Name;
 import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.models.SearchResponse;
 import co.empathy.academy.search.models.facets.Facet;
@@ -11,10 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,6 +96,21 @@ public class QueriesController {
                 add(searchService.getGenresAggregation());
             }};
             return ResponseEntity.ok(new SearchResponse(new ArrayList<>(), facets));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * GET /search/names/{nconst} - Returns the information of a person/name
+     *
+     * @param nconsts nconst of the person
+     * @return ResponseEntity - 200 with the information of the person or 500 if there is an error
+     */
+    @GetMapping(value = "/names/{nconsts}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Name>> nameSearch(@PathVariable String nconsts) {
+        try {
+            return ResponseEntity.ok(searchService.namesSearch(nconsts));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
