@@ -12,7 +12,7 @@
     "deathYear": {
       "type": "integer"
     },
-    "primaryProfession": {
+    "primaryProfessions": {
       "type": "text"
     }
   }
