@@ -115,5 +115,4 @@ public class IndexController {
         }
         return ResponseEntity.created(null).body(movie);
     }
-
 }

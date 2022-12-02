@@ -9,6 +9,6 @@ import lombok.Value;
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 public class Principal {
-    PrincipalsName principalsName;
+    PrincipalsName name;
     String characters;
 }

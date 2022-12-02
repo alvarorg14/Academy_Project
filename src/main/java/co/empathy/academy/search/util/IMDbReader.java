@@ -109,7 +109,9 @@ public class IMDbReader {
                         StringIntegerConversion.toInt(basics[7]), StringArrayConversion.toArray(basics[8]),
                         averageRating, numVotes, akas, directors, principals);
 
-                result.add(movie);
+                if (!basics[4].contentEquals("1")) {
+                    result.add(movie);
+                }
 
                 currentLinesRead++;
             } catch (IOException e) {
