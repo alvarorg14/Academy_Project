@@ -7,6 +7,6 @@ import lombok.Value;
 @Value
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-public class Name {
+public class PrincipalsName {
     String nconst;
 }

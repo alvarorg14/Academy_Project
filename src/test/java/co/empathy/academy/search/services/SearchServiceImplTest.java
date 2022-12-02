@@ -6,6 +6,7 @@ import co.empathy.academy.search.models.facets.Facet;
 import co.empathy.academy.search.models.facets.FacetValue;
 import co.empathy.academy.search.repositories.ElasticEngine;
 import co.empathy.academy.search.repositories.ElasticLowClient;
+import co.empathy.academy.search.repositories.names.ElasticNamesEngine;
 import co.empathy.academy.search.util.ResourcesUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,9 @@ class SearchServiceImplTest {
 
     private final QueriesService queriesService = mock(QueriesService.class);
 
-    private final SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService);
+    private final ElasticNamesEngine elasticNamesEngine = mock(ElasticNamesEngine.class);
+
+    private final SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService, elasticNamesEngine);
 
     private final Movie movie = ResourcesUtil.getMovie("");
 
@@ -41,7 +44,7 @@ class SearchServiceImplTest {
 
         ElasticEngine elasticEngine = mock(ElasticEngine.class);
 
-        SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService);
+        SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService, elasticNamesEngine);
 
         QueryResponse response = searchService.search(query);
 
@@ -56,7 +59,7 @@ class SearchServiceImplTest {
         given(elasticLowClient.getElasticInfo()).willThrow(new RuntimeException());
 
         ElasticEngine elasticEngine = mock(ElasticEngine.class);
-        SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService);
+        SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService, elasticNamesEngine);
 
         assertThrows(RuntimeException.class, () -> searchService.search(query));
     }
@@ -69,7 +72,7 @@ class SearchServiceImplTest {
         given(elasticLowClient.getElasticInfo()).willReturn("{\"cluster_name\":}");
 
         ElasticEngine elasticEngine = mock(ElasticEngine.class);
-        SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService);
+        SearchService searchService = new SearchServiceImpl(elasticLowClient, elasticEngine, queriesService, elasticNamesEngine);
 
         assertThrows(RuntimeException.class, () -> searchService.search(query));
     }

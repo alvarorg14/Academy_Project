@@ -3,6 +3,7 @@ package co.empathy.academy.search.services;
 import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.repositories.ElasticEngine;
+import co.empathy.academy.search.repositories.names.ElasticNamesEngine;
 import co.empathy.academy.search.util.IMDbReader;
 import co.empathy.academy.search.util.ResourcesUtil;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ class IndexServiceImplTest {
     private final MultipartFile principalsFile = new MockMultipartFile("principals", "principals.txt",
             "text/plain", "principals".getBytes());
     private final ElasticEngine engine = mock(ElasticEngine.class);
+    private final ElasticNamesEngine namesEngine = mock(ElasticNamesEngine.class);
     private final IMDbReader reader = mock(IMDbReader.class);
 
     @Test
@@ -40,7 +42,7 @@ class IndexServiceImplTest {
         given(reader.hasDocuments()).willReturn(true);
         given(reader.readDocuments()).willReturn(movies);
 
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
 
         assertDoesNotThrow(() -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile));
 
@@ -53,7 +55,7 @@ class IndexServiceImplTest {
 
         doThrow(BulkIndexException.class).when(engine).indexBulk(any());
 
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
 
         Exception exception = assertThrows(BulkIndexException.class,
                 () -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile));
@@ -66,7 +68,7 @@ class IndexServiceImplTest {
 
         doThrow(IOException.class).when(engine).indexBulk(any());
 
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
 
         Exception exception = assertThrows(IOException.class,
                 () -> service.indexImdbData(basicsFile, ratingsFile, akasFile, crewFile, principalsFile));
@@ -74,7 +76,7 @@ class IndexServiceImplTest {
 
     @Test
     void givenElasticUp_whenCreateIndex_thenIndexCreated() throws IOException {
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
         assertDoesNotThrow(() -> service.createIndex());
 
         verify(engine, times(1)).createIndex();
@@ -86,7 +88,7 @@ class IndexServiceImplTest {
     void givenElasticDown_whenCreateIndex_thenErrorCreating() throws IOException {
         doThrow(IOException.class).when(engine).createIndex();
 
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
         assertThrows(IOException.class, () -> service.createIndex());
 
         verify(engine, times(1)).createIndex();
@@ -98,7 +100,7 @@ class IndexServiceImplTest {
     void givenElasticDown_whenCreateIndex_thenErrorSetting() throws IOException {
         doThrow(IOException.class).when(engine).putSettings();
 
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
         assertThrows(IOException.class, () -> service.createIndex());
 
         verify(engine, times(1)).createIndex();
@@ -110,7 +112,7 @@ class IndexServiceImplTest {
     void givenElasticDown_whenCreateIndex_thenErrorMapping() throws IOException {
         doThrow(IOException.class).when(engine).putMapping();
 
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
         assertThrows(IOException.class, () -> service.createIndex());
 
         verify(engine, times(1)).createIndex();
@@ -122,7 +124,7 @@ class IndexServiceImplTest {
     void givenElasticUpAndMovie_whenIndexDocument_thenDocumentIndexed() throws IOException {
         doNothing().when(engine).indexDocument(any());
 
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
         assertDoesNotThrow(() -> service.indexDocument(movies.get(0)));
 
         verify(engine, times(1)).indexDocument(any());
@@ -131,7 +133,7 @@ class IndexServiceImplTest {
     @Test
     void givenElasticDownAndMovie_whenIndexDocument_thenErrorIndexing() throws IOException {
         doThrow(IOException.class).when(engine).indexDocument(any());
-        IndexServiceImpl service = new IndexServiceImpl(engine);
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
         assertThrows(IOException.class, () -> service.indexDocument(movies.get(0)));
 
         verify(engine, times(1)).indexDocument(any());

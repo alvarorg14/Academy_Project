@@ -3,10 +3,12 @@ package co.empathy.academy.search.services;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.empathy.academy.search.models.Movie;
+import co.empathy.academy.search.models.Name;
 import co.empathy.academy.search.models.QueryResponse;
 import co.empathy.academy.search.models.facets.Facet;
 import co.empathy.academy.search.repositories.ElasticEngine;
 import co.empathy.academy.search.repositories.ElasticLowClient;
+import co.empathy.academy.search.repositories.names.ElasticNamesEngine;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 
@@ -23,10 +25,14 @@ public class SearchServiceImpl implements SearchService {
 
     private final QueriesService queriesService;
 
-    public SearchServiceImpl(ElasticLowClient elasticLowClient, ElasticEngine elasticEngine, QueriesService queriesService) {
+    private final ElasticNamesEngine elasticNamesEngine;
+
+    public SearchServiceImpl(ElasticLowClient elasticLowClient, ElasticEngine elasticEngine, QueriesService queriesService,
+                             ElasticNamesEngine elasticNamesEngine) {
         this.elasticLowClient = elasticLowClient;
         this.elasticEngine = elasticEngine;
         this.queriesService = queriesService;
+        this.elasticNamesEngine = elasticNamesEngine;
     }
 
     /**
@@ -159,6 +165,18 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public Facet getGenresAggregation() throws IOException {
         return elasticEngine.getGenresAggregation();
+    }
+
+    /**
+     * Performs a search to get the names information
+     *
+     * @param nconsts - nconsts to search
+     * @return List of names information
+     */
+    @Override
+    public List<Name> namesSearch(String nconsts) throws IOException {
+        String[] nconstsArray = nconsts.split(",");
+        return elasticNamesEngine.performQuery(queriesService.termsQuery(nconstsArray, "nconst"));
     }
 
 

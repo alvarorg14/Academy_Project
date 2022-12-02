@@ -4,7 +4,7 @@ import co.empathy.academy.search.models.Aka;
 import co.empathy.academy.search.models.Director;
 import co.empathy.academy.search.models.Movie;
 import co.empathy.academy.search.models.Principal;
-import co.empathy.academy.search.models.principals.Name;
+import co.empathy.academy.search.models.principals.PrincipalsName;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -109,7 +109,9 @@ public class IMDbReader {
                         StringIntegerConversion.toInt(basics[7]), StringArrayConversion.toArray(basics[8]),
                         averageRating, numVotes, akas, directors, principals);
 
-                result.add(movie);
+                if (!basics[4].contentEquals("1")) {
+                    result.add(movie);
+                }
 
                 currentLinesRead++;
             } catch (IOException e) {
@@ -138,7 +140,7 @@ public class IMDbReader {
                             currentTconst = false;
                         }
                     } else {
-                        principals.add(new Principal(new Name(fields[2]), fields[5]));
+                        principals.add(new Principal(new PrincipalsName(fields[2]), fields[5]));
                     }
                 }
             }

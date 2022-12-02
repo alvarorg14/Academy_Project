@@ -61,6 +61,18 @@ public class IndexController {
         return ResponseEntity.accepted().build();
     }
 
+    @PostMapping("/names")
+    public ResponseEntity indexNames(@RequestParam("names") MultipartFile namesFile) {
+        try {
+            indexService.indexNamesData(namesFile);
+        } catch (BulkIndexException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.accepted().build();
+    }
+
     /**
      * PUT /index/create - Creates a new index
      *
@@ -103,5 +115,4 @@ public class IndexController {
         }
         return ResponseEntity.created(null).body(movie);
     }
-
 }

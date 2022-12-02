@@ -35,4 +35,11 @@ public interface IndexService {
     void indexImdbData(MultipartFile basicsFile, MultipartFile ratingsFile,
                        MultipartFile akasFile, MultipartFile crewFile, MultipartFile principalsFile)
             throws IOException, BulkIndexException;
+
+    /**
+     * Indexes names data
+     *
+     * @param namesFile File with the names data
+     */
+    void indexNamesData(MultipartFile namesFile) throws IOException, BulkIndexException;
 }

@@ -1,0 +1,19 @@
+{
+  "properties": {
+    "nconst": {
+      "type": "keyword"
+    },
+    "primaryName": {
+      "type": "text"
+    },
+    "birthYear": {
+      "type": "integer"
+    },
+    "deathYear": {
+      "type": "integer"
+    },
+    "primaryProfessions": {
+      "type": "text"
+    }
+  }
+}

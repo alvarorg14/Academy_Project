@@ -1,6 +1,6 @@
 package co.empathy.academy.search.models;
 
-import co.empathy.academy.search.models.principals.Name;
+import co.empathy.academy.search.models.principals.PrincipalsName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,15 +10,15 @@ class PrincipalTest {
 
     @Test
     void givenAttributes_whenConstructor_thenPrincipalCreated() {
-        Principal principal = new Principal(new Name("nconst"), "characters");
-        assertEquals("nconst", principal.getName().getNconst());
+        Principal principal = new Principal(new PrincipalsName("nconst"), "characters");
+        assertEquals("nconst", principal.getPrincipalsName().getNconst());
         assertEquals("characters", principal.getCharacters());
     }
 
     @Test
     void givenNoAttributes_whenConstructor_thenPrincipalCreated() {
         Principal principal = new Principal();
-        assertNull(principal.getName());
+        assertNull(principal.getPrincipalsName());
         assertNull(principal.getCharacters());
     }
 
