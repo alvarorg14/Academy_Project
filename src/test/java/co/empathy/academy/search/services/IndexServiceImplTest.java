@@ -2,9 +2,11 @@ package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.exceptions.BulkIndexException;
 import co.empathy.academy.search.models.Movie;
+import co.empathy.academy.search.models.Name;
 import co.empathy.academy.search.repositories.ElasticEngine;
 import co.empathy.academy.search.repositories.names.ElasticNamesEngine;
 import co.empathy.academy.search.util.IMDbReader;
+import co.empathy.academy.search.util.NamesReader;
 import co.empathy.academy.search.util.ResourcesUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
@@ -22,6 +24,8 @@ import static org.mockito.Mockito.*;
 class IndexServiceImplTest {
 
     private final List<Movie> movies = ResourcesUtil.getMovies();
+
+    private final List<Name> names = ResourcesUtil.getNames();
     private final MultipartFile basicsFile = new MockMultipartFile("basics", "basics.txt",
             "text/plain", "basics".getBytes());
     private final MultipartFile ratingsFile = new MockMultipartFile("ratings", "ratings.txt",
@@ -33,9 +37,12 @@ class IndexServiceImplTest {
             "text/plain", "crew".getBytes());
     private final MultipartFile principalsFile = new MockMultipartFile("principals", "principals.txt",
             "text/plain", "principals".getBytes());
+    private final MultipartFile namesFile = new MockMultipartFile("names", "names.txt",
+            "text/plain", "names".getBytes());
     private final ElasticEngine engine = mock(ElasticEngine.class);
     private final ElasticNamesEngine namesEngine = mock(ElasticNamesEngine.class);
     private final IMDbReader reader = mock(IMDbReader.class);
+    private final NamesReader namesReader = mock(NamesReader.class);
 
     @Test
     void givenAFileWithMovies_whenIndexIMDbData_thenMoviesIndexed() {
@@ -137,6 +144,29 @@ class IndexServiceImplTest {
         assertThrows(IOException.class, () -> service.indexDocument(movies.get(0)));
 
         verify(engine, times(1)).indexDocument(any());
+    }
+
+    @Test
+    void givenAFileWithNames_whenIndexNamesData_thenNamesIndexed() {
+        given(namesReader.hasDocuments()).willReturn(true);
+        given(namesReader.readDocuments()).willReturn(names);
+
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
+
+        assertDoesNotThrow(() -> service.indexNamesData(namesFile));
+    }
+
+    @Test
+    void givenAFileWithNames_whenIndexNamesData_thenBulkIndexException() throws BulkIndexException, IOException {
+        given(namesReader.hasDocuments()).willReturn(true);
+        given(namesReader.readDocuments()).willReturn(names);
+
+        doThrow(BulkIndexException.class).when(namesEngine).indexBulk(any());
+
+        IndexServiceImpl service = new IndexServiceImpl(engine, namesEngine);
+
+        Exception exception = assertThrows(BulkIndexException.class,
+                () -> service.indexNamesData(namesFile));
     }
 
 

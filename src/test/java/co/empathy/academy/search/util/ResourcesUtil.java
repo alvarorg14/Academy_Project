@@ -1,9 +1,6 @@
 package co.empathy.academy.search.util;
 
-import co.empathy.academy.search.models.Aka;
-import co.empathy.academy.search.models.Director;
-import co.empathy.academy.search.models.Movie;
-import co.empathy.academy.search.models.Principal;
+import co.empathy.academy.search.models.*;
 import co.empathy.academy.search.models.principals.PrincipalsName;
 
 import java.util.ArrayList;
@@ -56,6 +53,17 @@ public class ResourcesUtil {
         return new ArrayList<>() {{
             add(getPrincipal("1"));
             add(getPrincipal("2"));
+        }};
+    }
+
+    public static Name getName(String sufix) {
+        return new Name("testNConst" + sufix, "testPrimaryName" + sufix, 0, 0, new String[]{"testProfession1", "testProfession2"});
+    }
+
+    public static List<Name> getNames() {
+        return new ArrayList<>() {{
+            add(getName("1"));
+            add(getName("2"));
         }};
     }
 
