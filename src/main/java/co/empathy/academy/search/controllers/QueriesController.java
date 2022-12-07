@@ -110,6 +110,12 @@ public class QueriesController {
      * @param nconsts nconst of the person
      * @return ResponseEntity - 200 with the information of the person or 500 if there is an error
      */
+    @Operation(summary = "Search information about directors and actors")
+    @Parameter(name = "ids", description = "Nconsts of the people. Can be multiple ones, separated by commas. It matches exactly")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of names found"),
+            @ApiResponse(responseCode = "500", description = "Error searching the names")
+    })
     @GetMapping(value = "/names", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Name>> nameSearch(@RequestParam("ids") String nconsts) {
         try {
